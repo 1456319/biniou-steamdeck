@@ -64,12 +64,11 @@ def image_img2shape(
     frame_size_img2shape, 
     seed_img2shape, 
     output_type_img2shape,     
-    nsfw_filter, 
     progress_img2shape=gr.Progress(track_tqdm=True)
     ):
     
     print(">>>[Shap-E img2shape 🧊 ]: starting module") 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_img2shape_safetychecker, device_img2shape, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_img2shape_safetychecker, device_img2shape, "0")
     
     if modelid_img2shape[0:9] == "./models/" :
         pipe_img2shape = ShapEImg2ImgPipeline.from_single_file(
@@ -158,7 +157,6 @@ def image_img2shape(
         f"CFG scale={guidance_scale_img2shape} | "+\
         f"Frame size={frame_size_img2shape} | "+\
         f"Output type={output_type_img2shape} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])
     print(reporting_img2shape) 
 

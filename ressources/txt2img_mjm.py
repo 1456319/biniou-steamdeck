@@ -66,7 +66,6 @@ def image_txt2img_mjm(
     width_txt2img_mjm,
     seed_txt2img_mjm,
     use_gfpgan_txt2img_mjm,
-    nsfw_filter,
     tkme_txt2img_mjm,
     clipskip_txt2img_mjm,
     use_ays_txt2img_mjm,
@@ -76,7 +75,7 @@ def image_txt2img_mjm(
     print(">>>[Midjourney-mini 🖼️ ]: starting module")
     
 #    global pipe_txt2img_mjm
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_mjm_safetychecker, device_txt2img_mjm, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_mjm_safetychecker, device_txt2img_mjm, "0")
 
     if clipskip_txt2img_mjm == 0:
        clipskip_txt2img_mjm = None
@@ -164,7 +163,7 @@ def image_txt2img_mjm(
 
         for j in range(len(image)):
             seed_id = random_seed + i*num_images_per_prompt_txt2img_mjm + j if (seed_txt2img_mjm == 0) else seed_txt2img_mjm + i*num_images_per_prompt_txt2img_mjm + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
             if use_gfpgan_txt2img_mjm == True :
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -182,7 +181,6 @@ def image_txt2img_mjm(
         f"Token merging={tkme_txt2img_mjm} | "+\
         f"CLIP skip={clipskip_txt2img_mjm} | "+\
         f"AYS={use_ays_txt2img_mjm} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_txt2img_mjm} | "+\
         f"Negative prompt={negative_prompt_txt2img_mjm} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])

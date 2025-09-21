@@ -74,14 +74,13 @@ def image_vid2vid_ze(
     num_frames_vid2vid_ze,
     num_fps_vid2vid_ze,
     use_gfpgan_vid2vid_ze,
-    nsfw_filter,
     tkme_vid2vid_ze,
     progress_vid2vid_ze=gr.Progress(track_tqdm=True)
     ):
 
     print(">>>[Video Instruct-Pix2Pix 🖌️ ]: starting module")
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safety_checker, device_vid2vid_ze, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safety_checker, device_vid2vid_ze, "0")
     
     probe = ffmpeg.probe(vid_vid2vid_ze)
     video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
@@ -171,7 +170,6 @@ def image_vid2vid_ze(
         f"Size={width_vid2vid_ze}x{height_vid2vid_ze} | "+\
         f"GFPGAN={use_gfpgan_vid2vid_ze} | "+\
         f"Token merging={tkme_vid2vid_ze} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_vid2vid_ze} | "+\
         f"Negative prompt={negative_prompt_vid2vid_ze} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])

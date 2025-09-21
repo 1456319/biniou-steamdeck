@@ -67,14 +67,13 @@ def image_paintbyex(
     width_paintbyex, 
     seed_paintbyex, 
     use_gfpgan_paintbyex, 
-    nsfw_filter, 
     tkme_paintbyex,
     progress_paintbyex=gr.Progress(track_tqdm=True)
     ):
 
     print(">>>[Paint by example 🖌️ ]: starting module") 
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safety_checker, device_paintbyex, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safety_checker, device_paintbyex, "0")
     
     if modelid_paintbyex[0:9] == "./models/" :
         pipe_paintbyex = PaintByExamplePipeline.from_single_file(
@@ -144,9 +143,9 @@ def image_paintbyex(
 
         for j in range(len(image)):
             if (modelid_paintbyex[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_safety_checker, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_safety_checker, image[j], "0")
             seed_id = random_seed + i*num_images_per_prompt_paintbyex + j if (seed_paintbyex == 0) else seed_paintbyex + i*num_images_per_prompt_paintbyex + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, model_name=model)
             if use_gfpgan_paintbyex == True :
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -162,7 +161,6 @@ def image_paintbyex(
         f"Size={dim_size[0]}x{dim_size[1]} | "+\
         f"GFPGAN={use_gfpgan_paintbyex} | "+\
         f"Token merging={tkme_paintbyex} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])
     print(reporting_paintbyex) 
 

@@ -400,3 +400,50 @@ class biniouUIControl:
             savefile.write(compilation_args)
         print(f">>>[WebUI control 🧠 ]: update of llama-cpp-python backend {optimizer} finished.")
         return optimizer
+
+def apply_steamdeck_optimizations():
+    print(f">>>[WebUI control 🧠 ]: Applying Steam Deck optimizations...")
+    biniouUIControl.biniou_update("rocm")
+    biniouUIControl.biniou_llama_backend("rocm/hipblas")
+    print(f">>>[WebUI control 🧠 ]: Steam Deck optimizations applied.")
+    return
+
+def unified_model_downloader(url, model_type, progress=gr.Progress(track_tqdm=True)):
+    if not url:
+        print(">>>[Model Downloader]: URL is empty.")
+        return
+
+    model_type_paths = {
+        'Stable Diffusion': './models/Stable_Diffusion/',
+        'LoRA (SD)': './models/lora/SD/',
+        'LoRA (SDXL)': './models/lora/SDXL/',
+        'Textual Inversion (SD)': './models/TextualInversion/SD/',
+        'Textual Inversion (SDXL)': './models/TextualInversion/SDXL/',
+        'GGUF': './models/llamacpp/'
+    }
+
+    if model_type not in model_type_paths:
+        print(f">>>[Model Downloader]: Invalid model type: {model_type}")
+        return
+
+    path_dir = model_type_paths[model_type]
+    os.makedirs(path_dir, exist_ok=True)
+
+    filename = url.split('/')[-1]
+    path = os.path.join(path_dir, filename)
+
+    try:
+        with req.get(url, stream=True, timeout=10) as r:
+            r.raise_for_status()
+            total_size = int(r.headers.get("content-length", 0))
+            with tqdm(total=total_size, unit="B", unit_scale=True, desc=f"Downloading {filename}") as progress_bar:
+                with open(path, 'wb') as f:
+                    for chunk in r.iter_content(8192):
+                        progress_bar.update(len(chunk))
+                        f.write(chunk)
+        print(f">>>[Model Downloader]: Model {filename} downloaded successfully to {path_dir}.")
+        gr.Info(f"Downloaded {filename} successfully!")
+    except req.exceptions.RequestException as e:
+        print(f">>>[Model Downloader]: Error downloading model: {e}")
+        gr.Warning(f"Failed to download model from {url}.")
+    return

@@ -14,8 +14,8 @@
 <p align="justify">biniou is a self-hosted webui for several kinds of GenAI (generative artificial intelligence). You can generate multimedia contents with AI and use a chatbot on your own computer, even without dedicated GPU and starting from 8GB RAM. Can work offline (once deployed and required models downloaded).</p>
 
 <p align="center">
-<a href="#GNULinux">GNU/Linux base</a> :  [ <a href="#OpenSUSE-Leap-155--OpenSUSE-Tumbleweed">OpenSUSE</a> | <a href="#Rocky-93--Alma-93--CentOS-Stream-9--Fedora-39">RHEL</a> | <a href="#CachyOS">Arch</a> | <a href="#openmandriva">Mandriva</a> | <a href="#debian-12--ubuntu-22043--ubuntu-2404--linux-mint-212--linux-mint-22--pop-os">Debian</a> ] • <a href="#windows-10--windows-11">Windows</a> • <a href="#macos-intel-homebrew-install">macOS Intel (experimental)</a> • <a href="#dockerfile">Docker</a></br>
-<a href="https://github.com/Woolverine94/biniou/wiki">Documentation ❓</a> | <a href="https://github.com/Woolverine94/biniou/wiki/Showroom">Showroom 🖼️</a> | <a href="https://www.youtube.com/watch?v=WcCZSt6xMc4" target="_blank">Video presentation (by @Natlamir) 🎞️</a> | <a href="https://www.youtube.com/watch?v=e_gAJFTitYg" target="_blank">Windows install tutorial (by Fahd Mirza) 🎞️</a>
+GNU/Linux base :  [ OpenSUSE | RHEL | Arch | Mandriva | Debian ] • Windows • macOS Intel (experimental) • Docker</br>
+Documentation ❓ | Showroom 🖼️ | Video presentation (by @Natlamir) 🎞️ | Windows install tutorial (by Fahd Mirza) 🎞️
 </p>
 
 ---
@@ -58,23 +58,23 @@
 
 ## Menu
 <p align="left">
-  • <a href="#features">Features</a><br/>
-  • <a href="#prerequisites">Prerequisites</a><br/>
-  • <a href="#installation">Installation</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#GNULinux">GNU/Linux</a><br/> 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#OpenSUSE-Leap-155--OpenSUSE-Tumbleweed">OpenSUSE Leap 15.5 / OpenSUSE Tumbleweed</a><br/>  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Rocky-93--Alma-93--CentOS-Stream-9--Fedora-39">Rocky 9.3+ / Alma 9.3+ / CentOS Stream 9 / Fedora 39+</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#CachyOS">CachyOS</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#openmandriva">OpenMandriva</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#debian-12--ubuntu-22043--ubuntu-2404--linux-mint-212--linux-mint-22--pop-os">Debian 12 / Ubuntu 22.04.3 / Ubuntu 24.04 / Linux Mint 21.2+ / Linux Mint 22+ / Pop! OS</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#windows-10--windows-11">Windows 10 / Windows 11</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#macos-intel-homebrew-install">macOS Intel Homebrew install</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#dockerfile">Dockerfile</a><br/>
-  • <a href="#cuda-support">CUDA support</a><br/>
-  • <a href="#how-to-use">How To Use</a><br/>
-  • <a href="#good-to-know">Good to know</a><br/>
-  • <a href="#credits">Credits</a><br/>
-  • <a href="#license">License</a><br/>
+  • Features<br/>
+  • Prerequisites<br/>
+  • Installation<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GNU/Linux<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OpenSUSE Leap 15.5 / OpenSUSE Tumbleweed<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rocky 9.3+ / Alma 9.3+ / CentOS Stream 9 / Fedora 39+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CachyOS<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OpenMandriva<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Debian 12 / Ubuntu 22.04.3 / Ubuntu 24.04 / Linux Mint 21.2+ / Linux Mint 22+ / Pop! OS<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Windows 10 / Windows 11<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;macOS Intel Homebrew install<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Dockerfile<br/>
+  • CUDA support<br/>
+  • How To Use<br/>
+  • Good to know<br/>
+  • Credits<br/>
+  • License<br/>
 </p>
 
 ---

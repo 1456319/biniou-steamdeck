@@ -72,7 +72,6 @@ def image_txt2img_paa(
     width_txt2img_paa,
     seed_txt2img_paa,
     use_gfpgan_txt2img_paa,
-    nsfw_filter,
     tkme_txt2img_paa,
     progress_txt2img_paa=gr.Progress(track_tqdm=True)
     ):
@@ -80,7 +79,7 @@ def image_txt2img_paa(
     print(">>>[PixArt-Alpha 🖼️ ]: starting module")
     
 #    global pipe_txt2img_paa
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_paa_safetychecker, device_txt2img_paa, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_paa_safetychecker, device_txt2img_paa, "0")
 
     if ("YOSO" in modelid_txt2img_paa.upper()):
         if (modelid_txt2img_paa == "Luo-Yihong/yoso_pixart512"):
@@ -258,7 +257,7 @@ def image_txt2img_paa(
 
         for j in range(len(image)):
             seed_id = random_seed + i*num_images_per_prompt_txt2img_paa + j if (seed_txt2img_paa == 0) else seed_txt2img_paa + i*num_images_per_prompt_txt2img_paa + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
             if use_gfpgan_txt2img_paa == True :
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -274,7 +273,6 @@ def image_txt2img_paa(
         f"Size={width_txt2img_paa}x{height_txt2img_paa} | "+\
         f"GFPGAN={use_gfpgan_txt2img_paa} | "+\
         f"Token merging={tkme_txt2img_paa} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_txt2img_paa} | "+\
         f"Negative prompt={negative_prompt_txt2img_paa} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])

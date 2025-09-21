@@ -177,7 +177,6 @@ def image_txt2img_sd(
     width_txt2img_sd, 
     seed_txt2img_sd, 
     use_gfpgan_txt2img_sd, 
-    nsfw_filter, 
     tkme_txt2img_sd,
     clipskip_txt2img_sd,
     use_ays_txt2img_sd,
@@ -228,7 +227,7 @@ def image_txt2img_sd(
         lora_weight_array.append(float(lora_weight5_txt2img_sd))
 
     global pipe_txt2img_sd
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_sd, device_txt2img_sd, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_sd, device_txt2img_sd, "0")
 
     if clipskip_txt2img_sd == 0:
        clipskip_txt2img_sd = None
@@ -437,7 +436,7 @@ def image_txt2img_sd(
     if not is_sd3_txt2img_sd and not is_sd35_txt2img_sd and not is_sd35m_txt2img_sd and not is_flux_txt2img_sd:
         tomesd.apply_patch(pipe_txt2img_sd, ratio=tkme_txt2img_sd)
     if device_label_txt2img_sd == "cuda" :
-        pipe_txt2img_sd.enable_sequential_cpu_offload()
+        pipe_txt2img_sd.enable_model_cpu_offload()
     else: 
         pipe_txt2img_sd = pipe_txt2img_sd.to(device_txt2img_sd)
     if not is_sd3_txt2img_sd and not is_sd35_txt2img_sd and not is_sd35m_txt2img_sd:
@@ -615,9 +614,9 @@ def image_txt2img_sd(
         
         for j in range(len(image)):
             if is_xl_txt2img_sd or is_sd3_txt2img_sd or is_sd35_txt2img_sd or is_sd35m_txt2img_sd or is_flux_txt2img_sd or (modelid_txt2img_sd[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_txt2img_sd, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_txt2img_sd, image[j], "0")
             seed_id = random_seed + i*num_images_per_prompt_txt2img_sd + j if (seed_txt2img_sd == 0) else seed_txt2img_sd + i*num_images_per_prompt_txt2img_sd + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
             if use_gfpgan_txt2img_sd == True :
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -639,7 +638,6 @@ def image_txt2img_sd(
         f"LoRA model={lora_array} | "+\
         f"LoRA weight={lora_weight_array} | "+\
         f"Textual inversion={txtinv_txt2img_sd} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_txt2img_sd} | "+\
         f"Negative prompt={negative_prompt_txt2img_sd} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])

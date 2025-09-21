@@ -77,7 +77,6 @@ def image_txt2img_lcm(modelid_txt2img_lcm,
     width_txt2img_lcm, 
     seed_txt2img_lcm, 
     use_gfpgan_txt2img_lcm, 
-    nsfw_filter, 
     tkme_txt2img_lcm,
     lora_model_txt2img_lcm,
     lora_weight_txt2img_lcm,
@@ -124,7 +123,7 @@ def image_txt2img_lcm(modelid_txt2img_lcm,
         lora_weight_array.append(float(lora_weight5_txt2img_lcm))
 
     global pipe_txt2img_lcm
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_lcm_safetychecker, device_txt2img_lcm, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2img_lcm_safetychecker, device_txt2img_lcm, "0")
 
     if ("XL" in modelid_txt2img_lcm.upper()) or (modelid_txt2img_lcm == "latent-consistency/lcm-ssd-1b") or (modelid_txt2img_lcm == "segmind/Segmind-VegaRT"):
         is_xl_txt2img_lcm: bool = True
@@ -353,9 +352,9 @@ def image_txt2img_lcm(modelid_txt2img_lcm,
 
         for j in range(len(image)):
             if is_xl_txt2img_lcm or (modelid_txt2img_lcm == "latent-consistency/lcm-lora-sdv1-5") or (modelid_txt2img_lcm[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_txt2img_lcm_safetychecker, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_txt2img_lcm_safetychecker, image[j], "0")
             seed_id = random_seed + i*num_images_per_prompt_txt2img_lcm + j if (seed_txt2img_lcm == 0) else seed_txt2img_lcm + i*num_images_per_prompt_txt2img_lcm + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
             if use_gfpgan_txt2img_lcm == True :
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -375,7 +374,6 @@ def image_txt2img_lcm(modelid_txt2img_lcm,
         f"LoRA model={lora_array} | "+\
         f"LoRA weight={lora_weight_array} | "+\
         f"Textual inversion={txtinv_txt2img_lcm} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_txt2img_lcm} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])
     print(reporting_txt2img_lcm) 

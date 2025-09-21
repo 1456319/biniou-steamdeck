@@ -163,7 +163,6 @@ def image_img2img_ip(
     width_img2img_ip, 
     seed_img2img_ip, 
     use_gfpgan_img2img_ip, 
-    nsfw_filter, 
     tkme_img2img_ip,
     clipskip_img2img_ip,
     use_ays_img2img_ip,
@@ -215,7 +214,7 @@ def image_img2img_ip(
         lora_array.append(f"{lora_model5_img2img_ip}")
         lora_weight_array.append(float(lora_weight5_img2img_ip))
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_img2img_ip, device_img2img_ip, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_img2img_ip, device_img2img_ip, "0")
 
     if clipskip_img2img_ip == 0:
        clipskip_img2img_ip = None
@@ -626,7 +625,7 @@ def image_img2img_ip(
     if not is_flux_img2img_ip:
         tomesd.apply_patch(pipe_img2img_ip, ratio=tkme_img2img_ip)
     if device_label_img2img_ip == "cuda" :
-        pipe_img2img_ip.enable_sequential_cpu_offload()
+        pipe_img2img_ip.enable_model_cpu_offload()
     else :
         pipe_img2img_ip = pipe_img2img_ip.to(device_img2img_ip)
 
@@ -878,7 +877,7 @@ def image_img2img_ip(
 
         for j in range(len(image)):
             if is_xl_img2img_ip or is_flux_img2img_ip or (modelid_img2img_ip[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_img2img_ip, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_img2img_ip, image[j], "0")
             savename = name_image()
             if use_gfpgan_img2img_ip == True :
                 image[j] = image_gfpgan_mini(image[j])
@@ -901,7 +900,6 @@ def image_img2img_ip(
         f"LoRA model={lora_array} | "+\
         f"LoRA weight={lora_weight_array} | "+\
         f"Textual inversion={txtinv_img2img_ip} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Denoising strength={denoising_strength_img2img_ip} | "+\
         f"Prompt={prompt_img2img_ip} | "+\
         f"Negative prompt={negative_prompt_img2img_ip}"

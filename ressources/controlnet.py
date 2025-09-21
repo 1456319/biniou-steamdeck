@@ -575,7 +575,6 @@ def image_controlnet(
     preprocessor_controlnet,
     variant_controlnet,
     img_preview_controlnet,
-    nsfw_filter, 
     tkme_controlnet,
     clipskip_controlnet,
     use_ays_controlnet,
@@ -627,7 +626,7 @@ def image_controlnet(
         lora_array.append(f"{lora_model5_controlnet}")
         lora_weight_array.append(float(lora_weight5_controlnet))
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_controlnet, device_controlnet, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_controlnet, device_controlnet, "0")
 
     if clipskip_controlnet == 0:
        clipskip_controlnet = None
@@ -1033,9 +1032,9 @@ def image_controlnet(
 
         for j in range(len(image)):
             if is_xl_controlnet or is_sd3_controlnet or is_flux_controlnet or (modelid_controlnet[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_controlnet, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_controlnet, image[j], "0")
             seed_id = random_seed + i*num_images_per_prompt_controlnet + j if (seed_controlnet == 0) else seed_controlnet + i*num_images_per_prompt_controlnet + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
             if use_gfpgan_controlnet == True :
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -1060,7 +1059,6 @@ def image_controlnet(
         f"LoRA model={lora_array} | "+\
         f"LoRA weight={lora_weight_array} | "+\
         f"Textual inversion={txtinv_controlnet} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Pre-processor={preprocessor_controlnet} | "+\
         f"ControlNet model={variant_controlnet} | "+\
         f"Prompt={prompt_controlnet} | "+\
