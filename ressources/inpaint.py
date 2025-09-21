@@ -72,7 +72,6 @@ def image_inpaint(
     width_inpaint, 
     seed_inpaint, 
     use_gfpgan_inpaint, 
-    nsfw_filter, 
     tkme_inpaint,
     clipskip_inpaint,
     use_ays_inpaint,
@@ -81,7 +80,7 @@ def image_inpaint(
 
     print(">>>[inpaint 🖌️ ]: starting module")
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_inpaint_safety_checker, device_inpaint, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_inpaint_safety_checker, device_inpaint, "0")
 
     if clipskip_inpaint == 0:
        clipskip_inpaint = None
@@ -242,9 +241,9 @@ def image_inpaint(
 
         for j in range(len(image)):
             if is_xl_inpaint or (modelid_inpaint[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_inpaint_safety_checker, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_inpaint_safety_checker, image[j], "0")
             seed_id = random_seed + i*num_images_per_prompt_inpaint + j if (seed_inpaint == 0) else seed_inpaint + i*num_images_per_prompt_inpaint + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
             if use_gfpgan_inpaint == True :
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -264,7 +263,6 @@ def image_inpaint(
         f"Token merging={tkme_inpaint} | "+\
         f"CLIP skip={clipskip_inpaint} | "+\
         f"AYS={use_ays_inpaint} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Denoising strength={denoising_strength_inpaint} | "+\
         f"Prompt={prompt_inpaint} | "+\
         f"Negative prompt={negative_prompt_inpaint} | "+\

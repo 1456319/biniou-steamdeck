@@ -178,7 +178,6 @@ def image_img2img(
     seed_img2img, 
     source_type_img2img, 
     use_gfpgan_img2img, 
-    nsfw_filter, 
     tkme_img2img,
     clipskip_img2img,
     use_ays_img2img,
@@ -229,7 +228,7 @@ def image_img2img(
         lora_array.append(f"{lora_model5_img2img}")
         lora_weight_array.append(float(lora_weight5_img2img))
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_img2img, device_img2img, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_img2img, device_img2img, "0")
 
     if clipskip_img2img == 0:
        clipskip_img2img = None
@@ -614,7 +613,7 @@ def image_img2img(
 
         for j in range(len(image)):
             if is_xl_img2img or is_sd3_img2img or is_sd35_img2img or is_sd35m_img2img or is_flux_img2img or (modelid_img2img[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_img2img, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_img2img, image[j], "0")
             savename = name_image()
             if use_gfpgan_img2img == True :
                 image[j] = image_gfpgan_mini(image[j])
@@ -641,7 +640,6 @@ def image_img2img(
         f"LoRA model={lora_array} | "+\
         f"LoRA weight={lora_weight_array} | "+\
         f"Textual inversion={txtinv_img2img} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Denoising strength={denoising_strength_img2img} | "+\
         f"Prompt={prompt_img2img} | "+\
         f"Negative prompt={negative_prompt_img2img}"

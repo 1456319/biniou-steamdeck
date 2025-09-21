@@ -172,7 +172,6 @@ def video_txt2vid_ze(
     prompt_txt2vid_ze, 
     negative_prompt_txt2vid_ze, 
     output_type_txt2vid_ze,
-    nsfw_filter, 
     num_chunks_txt2vid_ze :int, 
     use_gfpgan_txt2vid_ze,
     tkme_txt2vid_ze,
@@ -183,7 +182,7 @@ def video_txt2vid_ze(
 
     modelid_txt2vid_ze = model_cleaner_sd(modelid_txt2vid_ze)
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2vid_ze, device_txt2vid_ze, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_txt2vid_ze, device_txt2vid_ze, "0")
 
     if is_sdxl(modelid_txt2vid_ze):
         is_xl_txt2vid_ze: bool = True
@@ -329,7 +328,6 @@ def video_txt2vid_ze(
         f"Timestep t1={timestep_t1_txt2vid_ze} | "+\
         f"GFPGAN={use_gfpgan_txt2vid_ze} | "+\
         f"Token merging={tkme_txt2vid_ze} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_txt2vid_ze} | "+\
         f"Negative prompt={negative_prompt_txt2vid_ze} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])

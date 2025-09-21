@@ -274,60 +274,6 @@ def ram_size():
 # Safety_Check : 
 safety_checker_model = "CompVis/stable-diffusion-safety-checker"
 
-def safety_checker_sd(model_path, device, nsfw_filter):
-    if nsfw_filter == "0" :
-        safecheck = None
-        feat_ex = None
-    elif nsfw_filter == "1" :
-        device, model_arch = detect_device()
-        safecheck = StableDiffusionSafetyChecker.from_pretrained(
-            safety_checker_model, 
-            cache_dir=model_path, 
-            torch_dtype=model_arch,
-            resume_download=True,
-            local_files_only=True if offline_test() else None
-        ).to(device)
-        feat_ex = AutoFeatureExtractor.from_pretrained(
-            safety_checker_model, 
-            cache_dir=model_path, 
-            torch_dtype=model_arch,
-            resume_download=True,
-            local_files_only=True if offline_test() else None
-            )
-    return safecheck, feat_ex
-
-def safety_checker_sdxl(model_path, image, nsfw_filter):
-    if nsfw_filter == "0":
-        return image
-    elif nsfw_filter == "1":
-        device, model_arch = detect_device()
-        safecheck = StableDiffusionSafetyChecker.from_pretrained(
-            safety_checker_model,
-            cache_dir=model_path,
-            torch_dtype=model_arch,
-            resume_download=True,
-            local_files_only=True if offline_test() else None
-        ).to(device)
-
-        feat_ex = AutoFeatureExtractor.from_pretrained(
-            "openai/clip-vit-base-patch32",
-            cache_dir=model_path,
-            torch_dtype=model_arch,
-            resume_download=True,
-            local_files_only=True if offline_test() else None
-            )
-
-        safety_checker_input = feat_ex(image, return_tensors="pt").to(device)
-        image_np = np.array(image)
-
-        _, is_nsfw = safecheck(
-            images=image_np,
-            clip_input=safety_checker_input.pixel_values.to(device),
-        )
-        if is_nsfw[0]:
-            image = Image.new("RGB", (image.width, image.height), (0, 0, 0))
-        return image
-
 def offline_test():
     try:
 #        rq.get("https://www.google.com", timeout=5)
@@ -379,8 +325,38 @@ def check_metadata(value):
         exif = True
     return exif
 
-def name_seeded_image(seed):
-    savename = f"outputs/{timestamper()}_{seed}.{check_image_fmt()}"
+def name_seeded_image(seed, **kwargs):
+    if test_cfg_exist("settings"):
+        with open(".ini/settings.cfg", "r", encoding="utf-8") as fichier:
+            exec(fichier.read())
+
+    use_custom_fn = locals().get('biniou_global_custom_fn', False)
+    fn_scheme = locals().get('biniou_global_fn_scheme', "{model}_{seed}_{date}")
+
+    if use_custom_fn:
+        now = time.localtime()
+
+        def sane_filename(name):
+            # Remove invalid characters and limit length
+            name = re.sub(r'[\\/*?:"<>|]',"", name)
+            return name[:150]
+
+        replacements = {
+            "{prompt}": sane_filename(kwargs.get('prompt', 'no_prompt')),
+            "{model}": sane_filename(model_cleaner_sd(kwargs.get('model_name', 'no_model'))),
+            "{seed}": str(seed),
+            "{date}": time.strftime("%Y-%m-%d", now),
+            "{time}": time.strftime("%H-%M-%S", now)
+        }
+
+        savename = fn_scheme
+        for placeholder, value in replacements.items():
+            savename = savename.replace(placeholder, value)
+
+        savename = f"outputs/{savename}.{check_image_fmt()}"
+    else:
+        savename = f"outputs/{timestamper()}_{seed}.{check_image_fmt()}"
+
     return savename
 
 def name_image():
@@ -441,24 +417,10 @@ def write_ini(module, *args) :
         savefile.write(content)
     return
 
-def write_auth(*args):
-    savename = f".ini/auth.cfg"
-    content = ""
-    for idx, data in enumerate(args):
-        content += f"{data} \n"
-    with open(savename, 'w', encoding="utf-8") as savefile:
-        savefile.write(content)
-    return 
-
 def write_settings_ini(
     module,
-    biniou_global_settings_lang_ui,
-    biniou_global_settings_server_name,
     biniou_global_settings_server_port,
     biniou_global_settings_inbrowser,
-    biniou_global_settings_auth,
-    biniou_global_settings_auth_message,
-    biniou_global_settings_share,
     biniou_global_settings_steps_max,
     biniou_global_settings_batch_size_max,
     biniou_global_settings_width_max_img_create,
@@ -479,16 +441,12 @@ def write_settings_ini(
     biniou_global_settings_gif_exif,
     biniou_global_settings_mp4_metadatas,
     biniou_global_settings_audio_metadatas,
-
+    biniou_global_settings_custom_fn,
+    biniou_global_settings_fn_scheme,
 ):
     savename = f".ini/{module}.cfg"
-    content = f"biniou_global_lang_ui = \"{biniou_global_settings_lang_ui}\"\n\
-biniou_global_server_name = {biniou_global_settings_server_name}\n\
-biniou_global_server_port = {biniou_global_settings_server_port}\n\
+    content = f"biniou_global_server_port = {biniou_global_settings_server_port}\n\
 biniou_global_inbrowser = {biniou_global_settings_inbrowser}\n\
-biniou_global_auth = {biniou_global_settings_auth}\n\
-biniou_global_auth_message = \"{biniou_global_settings_auth_message}\"\n\
-biniou_global_share = {biniou_global_settings_share}\n\
 biniou_global_steps_max = {biniou_global_settings_steps_max}\n\
 biniou_global_batch_size_max = {biniou_global_settings_batch_size_max}\n\
 biniou_global_width_max_img_create = {biniou_global_settings_width_max_img_create}\n\
@@ -508,7 +466,9 @@ biniou_global_text_metadatas = {biniou_global_settings_text_metadatas}\n\
 biniou_global_img_exif = {biniou_global_settings_img_exif}\n\
 biniou_global_gif_exif = {biniou_global_settings_gif_exif}\n\
 biniou_global_mp4_metadatas = {biniou_global_settings_mp4_metadatas}\n\
-biniou_global_audio_metadatas = {biniou_global_settings_audio_metadatas}"
+biniou_global_audio_metadatas = {biniou_global_settings_audio_metadatas}\n\
+biniou_global_custom_fn = {biniou_global_settings_custom_fn}\n\
+biniou_global_fn_scheme = \"{biniou_global_settings_fn_scheme}\""
     with open(savename, 'w', encoding="utf-8") as savefile:
         savefile.write(content)
     return
@@ -522,16 +482,6 @@ def read_ini(module) :
             ligne = ligne.replace("\\n", "\n")
             ligne = ligne.strip(' \n')
             content.append(ligne)
-    return content
-
-def read_auth() :
-    filename = f".ini/auth.cfg"
-    content = []
-    with open(filename, "r", encoding="utf-8") as fichier :
-        lignes = fichier.readlines()
-        for ligne in lignes : 
-            ligne = ligne.strip(' \n')
-            content.append(tuple(ligne.split(':')))
     return content
 
 def test_cfg_exist(module) :
@@ -1777,7 +1727,7 @@ def autodoc(toparse):
     content = ""
     for item in toparse:
         if (item[:2] != "-[") and (item[:2] != "./"):
-            content += f"<a href='https://huggingface.co/{item}' target='_blank'>{item}</a>, "
+            content += f"{item}, "
         elif (item[:2] == "-["):
             content += f"<br />{item}: "
         elif (item[:2] == "./"):

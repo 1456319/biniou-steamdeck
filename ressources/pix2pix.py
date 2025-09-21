@@ -87,14 +87,13 @@ def image_pix2pix(
     width_pix2pix, 
     seed_pix2pix, 
     use_gfpgan_pix2pix, 
-    nsfw_filter, 
     tkme_pix2pix,
     progress_pix2pix=gr.Progress(track_tqdm=True)
     ):
 
     print(">>>[Instruct pix2pix 🖌️ ]: starting module")
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safety_checker, device_pix2pix, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safety_checker, device_pix2pix, "0")
 
     if is_sdxl(modelid_pix2pix):
         is_xl_pix2pix: bool = True
@@ -224,7 +223,6 @@ def image_pix2pix(
         f"Size={width_pix2pix}x{height_pix2pix} | "+\
         f"GFPGAN={use_gfpgan_pix2pix} | "+\
         f"Token merging={tkme_pix2pix} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_pix2pix} | "+\
         f"Negative prompt={negative_prompt_pix2pix}"
     print(reporting_pix2pix) 

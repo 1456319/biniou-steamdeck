@@ -67,14 +67,13 @@ def image_magicmix(
     prompt_magicmix,
     mix_factor_magicmix,
     use_gfpgan_magicmix, 
-    nsfw_filter, 
     tkme_magicmix,
     progress_magicmix=gr.Progress(track_tqdm=True)
     ):
 
     print(">>>[MagicMix 🖼️ ]: starting module")
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_magicmix, device_magicmix, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_magicmix, device_magicmix, "0")
         
     if modelid_magicmix[0:9] == "./models/" :
         pipe_magicmix = DiffusionPipeline.from_single_file(
@@ -142,9 +141,9 @@ def image_magicmix(
             guidance_scale=guidance_scale_magicmix,
         )
         if (modelid_magicmix[0:9] == "./models/"):
-            image = safety_checker_sdxl(model_path_magicmix, image, nsfw_filter)
+            image = safety_checker_sdxl(model_path_magicmix, image, "0")
         seed_id = random_seed + i if (seed_magicmix == 0) else seed_magicmix + i
-        savename = name_seeded_image(seed_id)
+        savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
         if use_gfpgan_magicmix == True :
             image = image_gfpgan_mini(image)
         image.save(savename)
@@ -161,7 +160,6 @@ def image_magicmix(
         f"Kmax={kmax_magicmix} | "+\
         f"GFPGAN={use_gfpgan_magicmix} | "+\
         f"Token merging={tkme_magicmix} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Mix factor={mix_factor_magicmix} | "+\
         f"Prompt={prompt_magicmix} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])

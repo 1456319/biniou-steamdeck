@@ -215,7 +215,6 @@ def image_faceid_ip(
     width_faceid_ip, 
     seed_faceid_ip, 
     use_gfpgan_faceid_ip, 
-    nsfw_filter, 
     tkme_faceid_ip,
     clipskip_faceid_ip,
     lora_model_faceid_ip,
@@ -264,7 +263,7 @@ def image_faceid_ip(
         lora_array.append(f"{lora_model5_faceid_ip}")
         lora_weight_array.append(float(lora_weight5_faceid_ip))
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_faceid_ip, device_faceid_ip, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_faceid_ip, device_faceid_ip, "0")
 
     if clipskip_faceid_ip == 0:
        clipskip_faceid_ip = None
@@ -413,7 +412,7 @@ def image_faceid_ip(
 #    pipe_faceid_ip.enable_attention_slicing("max")
     tomesd.apply_patch(pipe_faceid_ip, ratio=tkme_faceid_ip)
     if device_label_faceid_ip == "cuda" :
-        pipe_faceid_ip.enable_sequential_cpu_offload()
+        pipe_faceid_ip.enable_model_cpu_offload()
     else : 
         pipe_faceid_ip = pipe_faceid_ip.to(device_faceid_ip)
     pipe_faceid_ip.enable_vae_slicing()
@@ -587,9 +586,9 @@ def image_faceid_ip(
 
         for j in range(len(image)):
             if is_xl_faceid_ip or (modelid_faceid_ip[0:9] == "./models/"):
-                image[j] = safety_checker_sdxl(model_path_faceid_ip, image[j], nsfw_filter)
+                image[j] = safety_checker_sdxl(model_path_faceid_ip, image[j], "0")
             seed_id = random_seed + i*num_images_per_prompt_faceid_ip + j if (seed_faceid_ip == 0) else seed_faceid_ip + i*num_images_per_prompt_faceid_ip + j
-            savename = name_seeded_image(seed_id)
+            savename = name_seeded_image(seed_id, prompt=prompt, model_name=model)
             if use_gfpgan_faceid_ip == True:
                 image[j] = image_gfpgan_mini(image[j])
             image[j].save(savename)
@@ -613,7 +612,6 @@ def image_faceid_ip(
         f"LoRA model={lora_array} | "+\
         f"LoRA weight={lora_weight_array} | "+\
         f"Textual inversion={txtinv_faceid_ip} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Denoising strength={denoising_strength_faceid_ip} | "+\
         f"Prompt={prompt_faceid_ip} | "+\
         f"Negative prompt={negative_prompt_faceid_ip} | "+\

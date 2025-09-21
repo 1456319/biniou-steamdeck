@@ -80,7 +80,6 @@ def video_animatediff_lcm(
     prompt_animatediff_lcm,
     negative_prompt_animatediff_lcm,
     output_type_animatediff_lcm,
-    nsfw_filter,
     use_gfpgan_animatediff_lcm,
     tkme_animatediff_lcm,
     clipskip_animatediff_lcm,
@@ -89,7 +88,7 @@ def video_animatediff_lcm(
 
     print(">>>[AnimateLCM 📼 ]: starting module")
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_animatediff_lcm, device_animatediff_lcm, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_animatediff_lcm, device_animatediff_lcm, "0")
 
     if clipskip_animatediff_lcm == 0:
        clipskip_animatediff_lcm = None
@@ -244,7 +243,6 @@ def video_animatediff_lcm(
         f"GFPGAN={use_gfpgan_animatediff_lcm} | "+\
         f"Token merging={tkme_animatediff_lcm} | "+\
         f"CLIP skip={clipskip_animatediff_lcm} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Prompt={prompt_animatediff_lcm} | "+\
         f"Negative prompt={negative_prompt_animatediff_lcm} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])

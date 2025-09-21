@@ -60,7 +60,6 @@ def video_img2vid(
     num_videos_per_prompt_img2vid,
     motion_bucket_id_img2vid,
     noise_aug_strength_img2vid,
-    nsfw_filter,
     img_img2vid,
     output_type_img2vid,
     use_gfpgan_img2vid,
@@ -70,7 +69,7 @@ def video_img2vid(
     
     print(">>>[Stable Video Diffusion 📼 ]: starting module")
 
-    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safetychecker_img2vid, device_img2vid, nsfw_filter)
+    nsfw_filter_final, feat_ex = safety_checker_sd(model_path_safetychecker_img2vid, device_img2vid, "0")
 
     pipe_img2vid = StableVideoDiffusionPipeline.from_pretrained(
         modelid_img2vid,
@@ -150,7 +149,6 @@ def video_img2vid(
         f"Motion bucket id={motion_bucket_id_img2vid} | "+\
         f"Noise strength={noise_aug_strength_img2vid} | "+\
         f"GFPGAN={use_gfpgan_img2vid} | "+\
-        f"nsfw_filter={bool(int(nsfw_filter))} | "+\
         f"Seed List="+ ', '.join([f"{final_seed[m]}" for m in range(len(final_seed))])
     print(reporting_img2vid)
 
