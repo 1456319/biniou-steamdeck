@@ -48,7 +48,7 @@ os.makedirs(ini_dir, exist_ok=True)
 
 log_dir="./.logs"
 os.makedirs(log_dir, exist_ok=True)
-logfile_biniou = "{log_dir}/output.log"
+logfile_biniou = f"{log_dir}/output.log"
 sys.stdout = Logger(logfile_biniou)
 
 get_window_url_params = """
@@ -116,9 +116,11 @@ biniou_global_version = biniou_global_version.replace("\n", "")
 
 if biniou_global_version == "main":
     commit_ver = subprocess.getoutput("git rev-parse HEAD")
-    biniou_global_version = "dev {commit_ver[0:7]}"
+    biniou_global_version = f"dev {commit_ver[0:7]}"
 
-if test_lang_exist("{biniou_global_lang_ui}.cfg") and biniou_global_lang_ui != "lang_en_US":
+if test_lang_exist(f"{biniou_global_lang_ui}.cfg") and biniou_global_lang_ui != "lang_en_US":
+    with open(f"./ressources/{biniou_global_lang_ui}.cfg", "r", encoding="utf-8") as fichier:
+        exec(fichier.read())
 
 ## Fonctions communes
 def dummy():
@@ -2411,11 +2413,11 @@ def url_params_theme(url):
     if url.get('__theme') != None and url['__theme'] == "dark":
         del url['__theme']
         url_final = dict_to_url(url)
-        return "<span style='text-decoration: none;'><p style='float:left;'><img src='file/images/biniou_64_dark.png' width='48' height='48'/></p><span style='text-align: left; font-size: 32px; font-weight: bold; line-height:48px;'>iniou</span></span><span style='vertical-align: bottom; line-height:48px; font-size: 10px;'> ({biniou_global_version}) </span><span style='vertical-align: top; line-height:48px;'><button onclick=\"window.location.href='{url_final}';\" title='{UI_STRINGS[\"light_mode\"]}'>☀️</button></span>", banner_biniou.update(visible=True)
+        return f'''<span style='text-decoration: none;'><p style='float:left;'><img src='file/images/biniou_64_dark.png' width='48' height='48'/></p><span style='text-align: left; font-size: 32px; font-weight: bold; line-height:48px;'>iniou</span></span><span style='vertical-align: bottom; line-height:48px; font-size: 10px;'> ({biniou_global_version}) </span><span style='vertical-align: top; line-height:48px;'><button onclick="window.location.href='{url_final}';" title="{UI_STRINGS['light_mode']}">☀️</button></span>''', banner_biniou.update(visible=True)
     elif url.get('__theme') == None:
         url['__theme'] = "dark"
         url_final = dict_to_url(url)
-        return "<span style='text-decoration: none;'><p style='float:left;'><img src='file/images/biniou_64.png' width='48' height='48'/></p><span style='text-align: left; font-size: 32px; font-weight: bold; line-height:48px;'>iniou</span></span><span style='vertical-align: bottom; line-height:48px; font-size: 10px;'> ({biniou_global_version}) </span><span style='vertical-align: top; line-height:48px;'><button onclick=\"window.location.href='{url_final}';\" title='{UI_STRINGS[\"dark_mode\"]}'>🌘</button></span>", banner_biniou.update(visible=True)
+        return f'''<span style='text-decoration: none;'><p style='float:left;'><img src='file/images/biniou_64.png' width='48' height='48'/></p><span style='text-align: left; font-size: 32px; font-weight: bold; line-height:48px;'>iniou</span></span><span style='vertical-align: bottom; line-height:48px; font-size: 10px;'> ({biniou_global_version}) </span><span style='vertical-align: top; line-height:48px;'><button onclick="window.location.href='{url_final}';" title="{UI_STRINGS['dark_mode']}">🌘</button></span>''', banner_biniou.update(visible=True)
 
 def get_recommended_models(model_list):
     recommended_markers = ["-[ 👍", "-[ 👌", "-[ 👏", "-[ 🏆"]
@@ -2482,27 +2484,27 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                     with gr.Accordion("About", open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Chatbot Llama-cpp (gguf)"}</br>
-                                <b>{"Function : "}</b>{"Chat with an AI using "} llama-cpp-python</br>
-                                <b>{"Input(s) : "}</b>{"Input text"}</br>
-                                <b>{"Output(s) : "}</b>{"Output text"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>Chatbot Llama-cpp (gguf)</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_llamacpp_about_desc"]} llama-cpp-python</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(list(model_list_llamacpp.keys()))}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Type your request in the <b>Input</b> textbox field</br>- (optional) modify settings to use another model, change context size or modify maximum number of tokens generated.</br>- Click the <b>Generate</b> button to generate a response to your input, using the chatbot history to keep a context.</br>- Click the <b>Continue</b> button to complete the last reply."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_llamacpp_about_instruct"]}
                                 </br>
-                                <b>{"Models :"}</b></br>
-                                - {"You could place llama-cpp compatible .gguf models in the directory ./biniou/models/llamacpp. Restart Biniou to see them in the models list."}</br>
-                                - {"You can also copy/paste in the <b>Model</b> dropdown menu a HF repo ID (e.g : TheBloke/some_model-GGUF) from https://huggingface.co/models?sort=trending&search=thebloke+gguf. You must also set manually prompt and system templates according to the model page."}
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_llamacpp_about_models_inst1"]}</br>
+                                - {UI_STRINGS["tab_llamacpp_about_models_inst2"]}
                                 </div>
                                 """
                             )
@@ -2688,27 +2690,27 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     with gr.Group():
                                         gr.HTML(value="... last chatbot reply to ...")
                                         gr.HTML(value="... text module ...")
-                                        llamacpp_nllb = gr.Button("✍️ >> {"Nllb translation"}")
+                                        llamacpp_nllb = gr.Button(f'✍️ >> {UI_STRINGS["tab_nllb"]}')
                                         gr.HTML(value="... image module ...")
-                                        llamacpp_txt2img_sd = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        llamacpp_txt2img_kd = gr.Button("✍️ >> {"Kandinsky"}")
-                                        llamacpp_txt2img_lcm = gr.Button("✍️ >> {"LCM"}")
-                                        llamacpp_txt2img_mjm = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        llamacpp_txt2img_paa = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        llamacpp_img2img = gr.Button("✍️ >> {"Img2img"}")
-                                        llamacpp_img2img_ip = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        llamacpp_pix2pix = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        llamacpp_inpaint = gr.Button("✍️ >> {"Inpaint"}")
-                                        llamacpp_controlnet = gr.Button("✍️ >> {"ControlNet"}")
-                                        llamacpp_faceid_ip = gr.Button("✍️ >> {"Photobooth"}")
+                                        llamacpp_txt2img_sd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        llamacpp_txt2img_kd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        llamacpp_txt2img_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        llamacpp_txt2img_mjm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        llamacpp_txt2img_paa = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        llamacpp_img2img = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        llamacpp_img2img_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        llamacpp_pix2pix = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        llamacpp_inpaint = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        llamacpp_controlnet = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        llamacpp_faceid_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                                         gr.HTML(value="... audio module ...")
-                                        llamacpp_musicgen = gr.Button("✍️ >> {"MusicGen"}")
-                                        llamacpp_audiogen = gr.Button("✍️ >> {"AudioGen"}")
-                                        llamacpp_bark = gr.Button("✍️ >> {"Bark"}")
+                                        llamacpp_musicgen = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        llamacpp_audiogen = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
+                                        llamacpp_bark = gr.Button(f'✍️ >> {UI_STRINGS["tab_bark"]}')
                                         gr.HTML(value="... video module ...")
-                                        llamacpp_txt2vid_ms = gr.Button("✍️ >> {"Modelscope"}")
-                                        llamacpp_txt2vid_ze = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        llamacpp_animatediff_lcm = gr.Button("✍️ >> {"AnimateDif"}")
+                                        llamacpp_txt2vid_ms = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        llamacpp_txt2vid_ze = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        llamacpp_animatediff_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
@@ -2724,13 +2726,15 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                         with gr.Box():
                             gr.HTML(
                                 """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Llava (gguf)"}</br>
-                                <b>{"Function : "}</b>{"Interrogate a chatbot about an input image using "}llama-cpp-python, Llava, BakLLaVA</br>
-                                <b>{"Input(s) : "}</b>{"Input image, Input text"}</br>
-                                <b>{"Output(s) : "}</b>{"Output text"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>Llava (gguf)</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_llava_about_desc"]} llama-cpp-python, Llava, BakLLaVA</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_llava_about_input_value"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(list(model_list_llava.keys()))}<br />
+                                """
                                 """
                             )
                         with gr.Box():
@@ -2920,27 +2924,27 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     with gr.Group():
                                         gr.HTML(value="... last chatbot reply to ...")
                                         gr.HTML(value="... text module ...")
-                                        llava_nllb = gr.Button("✍️ >> {"Nllb translation"}")
+                                        llava_nllb = gr.Button(f'✍️ >> {UI_STRINGS["tab_nllb"]}')
                                         gr.HTML(value="... image module ...")
-                                        llava_txt2img_sd = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        llava_txt2img_kd = gr.Button("✍️ >> {"Kandinsky"}")
-                                        llava_txt2img_lcm = gr.Button("✍️ >> {"LCM"}")
-                                        llava_txt2img_mjm = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        llava_txt2img_paa = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        llava_img2img = gr.Button("✍️ >> {"Img2img"}")
-                                        llava_img2img_ip = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        llava_pix2pix = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        llava_inpaint = gr.Button("✍️ >> {"Inpaint"}")
-                                        llava_controlnet = gr.Button("✍️ >> {"ControlNet"}")
-                                        llava_faceid_ip = gr.Button("✍️ >> {"Photobooth"}")
+                                        llava_txt2img_sd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        llava_txt2img_kd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        llava_txt2img_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        llava_txt2img_mjm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        llava_txt2img_paa = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        llava_img2img = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        llava_img2img_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        llava_pix2pix = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        llava_inpaint = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        llava_controlnet = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        llava_faceid_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                                         gr.HTML(value="... audio module ...")
-                                        llava_musicgen = gr.Button("✍️ >> {"MusicGen"}")
-                                        llava_audiogen = gr.Button("✍️ >> {"AudioGen"}")
-                                        llava_bark = gr.Button("✍️ >> {"Bark"}")
+                                        llava_musicgen = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        llava_audiogen = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
+                                        llava_bark = gr.Button(f'✍️ >> {UI_STRINGS["tab_bark"]}')
                                         gr.HTML(value="... video module ...")
-                                        llava_txt2vid_ms = gr.Button("✍️ >> {"Modelscope"}")
-                                        llava_txt2vid_ze = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        llava_animatediff_lcm = gr.Button("✍️ >> {"AnimateDif"}")
+                                        llava_txt2vid_ms = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        llava_txt2vid_ze = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        llava_animatediff_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
@@ -2950,27 +2954,27 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     with gr.Group():
                                         gr.HTML(value="... both to ...")
 # Image captioning
-                with gr.TabItem("Image captioning 👁️", id=13) as tab_img2txt_git:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_img2txt_git"], id=13) as tab_img2txt_git:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Image captioning"}</br>
-                                <b>{"Function : "}</b>{"Caption an image by a simple description of it using GIT"}</br>
-                                <b>{"Input(s) : "}</b>{"Input image"}</br>
-                                <b>{"Output(s) : "}</b>{"Caption text"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_img2txt_git"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_img2txt_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_img2txt_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_img2txt_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_img2txt_git)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload an input image by clicking on the <b>Input image</b> field</br>- (optional) modify settings to use another model, change min. and/or max. number of tokens generated.</br>- Click the <b>Generate button</b></br>- After generation, captions of the image are displayed in the Generated captions field"}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_img2txt_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -3049,26 +3053,26 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     with gr.Group():
                                         gr.HTML(value="... selected output to ...")
                                         gr.HTML(value="... text module ...")
-                                        img2txt_git_nllb = gr.Button("✍️ >> {"Nllb translation"}")
+                                        img2txt_git_nllb = gr.Button(f'✍️ >> {UI_STRINGS["tab_nllb"]}')
                                         gr.HTML(value="... image module ...")
-                                        img2txt_git_txt2img_sd = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        img2txt_git_txt2img_kd = gr.Button("✍️ >> {"Kandinsky"}")
-                                        img2txt_git_txt2img_lcm = gr.Button("✍️ >> {"LCM"}")
-                                        img2txt_git_txt2img_mjm = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        img2txt_git_txt2img_paa = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        img2txt_git_img2img = gr.Button("✍️ >> {"Img2img"}")
-                                        img2txt_git_img2img_ip = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        img2txt_git_pix2pix = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        img2txt_git_inpaint = gr.Button("✍️ >> {"Inpaint"}")
-                                        img2txt_git_controlnet = gr.Button("✍️ >> {"ControlNet"}")
-                                        img2txt_git_faceid_ip = gr.Button("✍️ >> {"Photobooth"}")
+                                        img2txt_git_txt2img_sd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        img2txt_git_txt2img_kd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        img2txt_git_txt2img_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        img2txt_git_txt2img_mjm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        img2txt_git_txt2img_paa = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        img2txt_git_img2img = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        img2txt_git_img2img_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        img2txt_git_pix2pix = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2txt_git_inpaint = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2txt_git_controlnet = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2txt_git_faceid_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                                         gr.HTML(value="... audio module ...")
-                                        img2txt_git_musicgen = gr.Button("✍️ >> {"MusicGen"}")
-                                        img2txt_git_audiogen = gr.Button("✍️ >> {"AudioGen"}")
+                                        img2txt_git_musicgen = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        img2txt_git_audiogen = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
                                         gr.HTML(value="... video module ...")
-                                        img2txt_git_txt2vid_ms = gr.Button("✍️ >> {"Modelscope"}")
-                                        img2txt_git_txt2vid_ze = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        img2txt_git_animatediff_lcm = gr.Button("✍️ >> {"AnimateDif"}")
+                                        img2txt_git_txt2vid_ms = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        img2txt_git_txt2vid_ze = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        img2txt_git_animatediff_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
@@ -3077,35 +3081,35 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 with gr.Box():
                                     with gr.Group():
                                         gr.HTML(value="... both to ...")
-                                        img2txt_git_img2img_both = gr.Button("🖼️+✍️ >> {"Img2img"}")
-                                        img2txt_git_img2img_ip_both = gr.Button("🖼️+✍️ >> {"IP-Adapter"}")
-                                        img2txt_git_pix2pix_both = gr.Button("🖼️+✍️ >> {"Instruct pix2pix"}")
-                                        img2txt_git_inpaint_both = gr.Button("🖼️+✍️ >> {"Inpaint"}")
-                                        img2txt_git_controlnet_both = gr.Button("🖼️+✍️ >> {"ControlNet"}")
-                                        img2txt_git_faceid_ip_both = gr.Button("🖼️+✍️ >> {"Photobooth"}")
+                                        img2txt_git_img2img_both = gr.Button(f'🖼️+✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        img2txt_git_img2img_ip_both = gr.Button(f'🖼️+✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        img2txt_git_pix2pix_both = gr.Button(f'🖼️+✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2txt_git_inpaint_both = gr.Button(f'🖼️+✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2txt_git_controlnet_both = gr.Button(f'🖼️+✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2txt_git_faceid_ip_both = gr.Button(f'🖼️+✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # Whisper 
                 with gr.TabItem("Whisper 👂", id=14) as tab_whisper:
                     with gr.Accordion("About", open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Whisper"}</br>
-                                <b>{"Function : "}</b>{"Transcribe/translate audio to text with "}whisper</br>
-                                <b>{"Input(s) : "}</b>{"Input audio"}</br>
-                                <b>{"Output(s) : "}</b>{"Transcribed/translated text"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_whisper"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_whisper_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_whisper_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_whisper_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(list(model_list_whisper.keys()))}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload an input audio file by clicking on the <b>Source audio</b> field or select the <b>micro</b> input type and record your voice</br>- Select the source language of the audio</br>- Select the task to execute : transcribe in source language or translate to english</br>- (optional) modify settings to use another model, or generate SRT-formated subtitles</br>- Click the <b>Generate</b> button</br>- After generation, audio transcription is displayed in the <b>Output text</b> field"}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_whisper_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -3183,27 +3187,27 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     with gr.Group():
                                         gr.HTML(value="... output text to ...")
                                         gr.HTML(value="... text module ...")
-                                        whisper_nllb = gr.Button("✍️ >> {"Nllb translation"}")
+                                        whisper_nllb = gr.Button(f'✍️ >> {UI_STRINGS["tab_nllb"]}')
                                         gr.HTML(value="... image module ...")
-                                        whisper_txt2img_sd = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        whisper_txt2img_kd = gr.Button("✍️ >> {"Kandinsky"}")
-                                        whisper_txt2img_lcm = gr.Button("✍️ >> {"LCM"}")
-                                        whisper_txt2img_mjm = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        whisper_txt2img_paa = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        whisper_img2img = gr.Button("✍️ >> {"Img2img"}")
-                                        whisper_img2img_ip = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        whisper_pix2pix = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        whisper_inpaint = gr.Button("✍️ >> {"Inpaint"}")
-                                        whisper_controlnet = gr.Button("✍️ >> {"ControlNet"}")
-                                        whisper_faceid_ip = gr.Button("✍️ >> {"Photobooth"}")
+                                        whisper_txt2img_sd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        whisper_txt2img_kd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        whisper_txt2img_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        whisper_txt2img_mjm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        whisper_txt2img_paa = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        whisper_img2img = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        whisper_img2img_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        whisper_pix2pix = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        whisper_inpaint = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        whisper_controlnet = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        whisper_faceid_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                                         gr.HTML(value="... audio module ...")
-                                        whisper_musicgen = gr.Button("✍️ >> {"MusicGen"}")
-                                        whisper_audiogen = gr.Button("✍️ >> {"AudioGen"}")
-                                        whisper_bark = gr.Button("✍️ >> {"Bark"}")
+                                        whisper_musicgen = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        whisper_audiogen = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
+                                        whisper_bark = gr.Button(f'✍️ >> {UI_STRINGS["tab_bark"]}')
                                         gr.HTML(value="... video module ...")
-                                        whisper_txt2vid_ms = gr.Button("✍️ >> {"Modelscope"}")
-                                        whisper_txt2vid_ze = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        whisper_animatediff_lcm = gr.Button("✍️ >> {"AnimateDif"}")
+                                        whisper_txt2vid_ms = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        whisper_txt2vid_ze = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        whisper_animatediff_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
@@ -3214,27 +3218,27 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                         gr.HTML(value="... both to ...")
 
 # nllb 
-                with gr.TabItem("Nllb translation 👥", id=15) as tab_nllb:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_nllb"], id=15) as tab_nllb:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Nllb translation"}</br>
-                                <b>{"Function : "}</b>{"Translate text with "}nllb</br>
-                                <b>{"Input(s) : "}</b>{"Input text"}</br>
-                                <b>{"Output(s) : "}</b>{"Translated text"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_nllb"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_nllb_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_nllb_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_nllb_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_nllb)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Select an <b>input language</b></br>- Type or copy/paste the text to translate in the <b>source text</b> field</br>- Select an <b>output language</b></br>- (optional) modify settings to use another model, or reduce the maximum number of tokens in the output</br>- Click the <b>Generate</b> button</br>- After generation, translation is displayed in the <b>Output text</b> field"}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_nllb_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -3296,33 +3300,33 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_nllb,
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... output text to ...")
-                                        nllb_llamacpp = gr.Button("✍️ >> {"Chatbot Llama-cpp (gguf)"}")
-                                        gr.HTML(value="... image module ...")
-                                        nllb_txt2img_sd = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        nllb_txt2img_kd = gr.Button("✍️ >> {"Kandinsky"}")
-                                        nllb_txt2img_lcm = gr.Button("✍️ >> {"LCM"}")
-                                        nllb_txt2img_mjm = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        nllb_txt2img_paa = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        nllb_img2img = gr.Button("✍️ >> {"Img2img"}")
-                                        nllb_img2img_ip = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        nllb_pix2pix = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        nllb_inpaint = gr.Button("✍️ >> {"Inpaint"}")
-                                        nllb_controlnet = gr.Button("✍️ >> {"ControlNet"}")
-                                        nllb_faceid_ip = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... audio module ...")
-                                        nllb_musicgen = gr.Button("✍️ >> {"MusicGen"}")
-                                        nllb_audiogen = gr.Button("✍️ >> {"AudioGen"}")
-                                        nllb_bark = gr.Button("✍️ >> {"Bark"}")
-                                        gr.HTML(value="... video module ...")
-                                        nllb_txt2vid_ms = gr.Button("✍️ >> {"Modelscope"}")
-                                        nllb_txt2vid_ze = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        nllb_animatediff_lcm = gr.Button("✍️ >> {"AnimateDif"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_output_text"]} ...')
+                                        nllb_llamacpp = gr.Button(f'✍️ >> {UI_STRINGS["tab_llamacpp"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        nllb_txt2img_sd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        nllb_txt2img_kd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        nllb_txt2img_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        nllb_txt2img_mjm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        nllb_txt2img_paa = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        nllb_img2img = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        nllb_img2img_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        nllb_pix2pix = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        nllb_inpaint = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        nllb_controlnet = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        nllb_faceid_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        nllb_musicgen = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        nllb_audiogen = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
+                                        nllb_bark = gr.Button(f'✍️ >> {UI_STRINGS["tab_bark"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        nllb_txt2vid_ms = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        nllb_txt2vid_ze = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        nllb_animatediff_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
@@ -3334,31 +3338,31 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
 
 # txt2prompt
                 if ram_size() >= 16 :
-                    titletab_txt2prompt = "{"Prompt generator"} 📝"
+                    titletab_txt2prompt = f'{UI_STRINGS["tab_txt2prompt"]} 📝'
                 else :
-                    titletab_txt2prompt = "{"Prompt generator"} ⛔"
+                    titletab_txt2prompt = f'{UI_STRINGS["tab_txt2prompt"]} ⛔'
 
                 with gr.TabItem(titletab_txt2prompt, id=16) as tab_txt2prompt:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Prompt generator"}</br>
-                                <b>{"Function : "}</b>{"Create complex prompt from a simple instruction."}</br>
-                                <b>{"Input(s) : "}</b>{"Prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Enhanced output prompt"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2prompt"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2prompt_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2prompt_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2prompt_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2prompt)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Define a <b>prompt</b></br>- Choose the type of output to produce : ChatGPT will produce a persona for the chatbot from your input, SD will generate a prompt usable for image and video modules</br>- Click the <b>Generate</b> button</br>- After generation, output is displayed in the <b>Output text</b> field. Send them to the desired module (chatbot or media modules)."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2prompt_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -3431,31 +3435,31 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_txt2prompt,
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... output text to ...")
-                                        gr.HTML(value="... text module ...")
-                                        txt2prompt_nllb = gr.Button("✍️ >> {"Nllb translation"}")
-                                        txt2prompt_llamacpp = gr.Button("✍️ >> {"Chatbot Llama-cpp (gguf)"}")
-                                        gr.HTML(value="... image module ...")
-                                        txt2prompt_txt2img_sd = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        txt2prompt_txt2img_kd = gr.Button("✍️ >> {"Kandinsky"}")
-                                        txt2prompt_txt2img_lcm = gr.Button("✍️ >> {"LCM"}")
-                                        txt2prompt_txt2img_mjm = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        txt2prompt_txt2img_paa = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        txt2prompt_img2img = gr.Button("✍️ >> {"Img2img"}")
-                                        txt2prompt_img2img_ip = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        txt2prompt_pix2pix = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        txt2prompt_inpaint = gr.Button("✍️ >> {"Inpaint"}")
-                                        txt2prompt_controlnet = gr.Button("✍️ >> {"ControlNet"}")
-                                        txt2prompt_faceid_ip = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2prompt_txt2vid_ms = gr.Button("✍️ >> {"Modelscope"}")
-                                        txt2prompt_txt2vid_ze = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        txt2prompt_animatediff_lcm = gr.Button("✍️ >> {"AnimateDif"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_output_text"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        txt2prompt_nllb = gr.Button(f'✍️ >> {UI_STRINGS["tab_nllb"]}')
+                                        txt2prompt_llamacpp = gr.Button(f'✍️ >> {UI_STRINGS["tab_llamacpp"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2prompt_txt2img_sd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        txt2prompt_txt2img_kd = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        txt2prompt_txt2img_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        txt2prompt_txt2img_mjm = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        txt2prompt_txt2img_paa = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        txt2prompt_img2img = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2prompt_img2img_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2prompt_pix2pix = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2prompt_inpaint = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2prompt_controlnet = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2prompt_faceid_ip = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2prompt_txt2vid_ms = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        txt2prompt_txt2vid_ze = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        txt2prompt_animatediff_lcm = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
@@ -3466,35 +3470,35 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                         gr.HTML(value="... both to ...")
 
 # Image
-        with gr.TabItem("Image 🖼️", id=2) as tab_image:
+        with gr.TabItem(UI_STRINGS["tab_image"], id=2) as tab_image:
             with gr.Tabs() as tabs_image:
 # Stable Diffusion
-                with gr.TabItem("Stable Diffusion 🖼️", id=21) as tab_txt2img_sd:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_txt2img_sd"], id=21) as tab_txt2img_sd:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Stable Diffusion"}</br>
-                                <b>{"Function : "}</b>{"Generate images from a prompt and a negative prompt using "}Stable Diffusion</br>
-                                <b>{"Input(s) : "}</b>{"Prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2img_sd"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2img_sd_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2img_sd_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2img_sd_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2img_sd)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- (optional) Modify the settings to use another model, generate several images in a single run or change dimensions of the outputs</br>- (optional) Select a LoRA model and set its weight</br>- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2img_sd_about_instruct"]}
                                 </br>
-                                <b>{"Models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list."}</br>
-                                <b>{"LoRA models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors LoRA models in the directory biniou/models/lora/SD or biniou/models/lora/SDXL (depending on the LoRA model type : SD 1.5 or SDXL). Restart Biniou to see them in the models list."}</br>
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_txt2img_sd_about_models_inst1"]}</br>
+                                <b>{UI_STRINGS["about_loras"]}</b></br>
+                                - {UI_STRINGS["tab_txt2img_sd_about_loras_inst1"]}</br>
                                 </div>                                
                                 """
                             )
@@ -3687,91 +3691,91 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_txt2img_sd, gs_out_txt2img_sd],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        txt2img_sd_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        txt2img_sd_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_sd_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        txt2img_sd_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        txt2img_sd_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        txt2img_sd_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        txt2img_sd_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        txt2img_sd_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        txt2img_sd_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        txt2img_sd_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        txt2img_sd_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        txt2img_sd_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        txt2img_sd_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        txt2img_sd_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        txt2img_sd_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_sd_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        txt2img_sd_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        txt2img_sd_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        txt2img_sd_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_sd_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_sd_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_sd_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        txt2img_sd_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_sd_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        txt2img_sd_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_sd_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        txt2img_sd_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        txt2img_sd_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_sd_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        txt2img_sd_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        txt2img_sd_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        txt2img_sd_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_sd_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        txt2img_sd_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_sd_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        txt2img_sd_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        txt2img_sd_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        txt2img_sd_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        txt2img_sd_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        txt2img_sd_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        txt2img_sd_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_sd_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        txt2img_sd_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        txt2img_sd_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_sd_txt2vid_ms_input = gr.Button("✍️ >> {"Modelscope"}")
-                                        txt2img_sd_txt2vid_ze_input = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        txt2img_sd_animatediff_lcm_input = gr.Button("✍️ >> {"AnimateDif"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_sd_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        txt2img_sd_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        txt2img_sd_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        txt2img_sd_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        txt2img_sd_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_sd_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_sd_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_sd_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_sd_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_sd_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_sd_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        txt2img_sd_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        txt2img_sd_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_sd_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        txt2img_sd_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        txt2img_sd_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_sd_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        txt2img_sd_controlnet_both = gr.Button("🖼️ + ✍️️ >> {"ControlNet"}")
-                                        txt2img_sd_faceid_ip_both = gr.Button("🖼️ + ✍️️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_sd_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_sd_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_sd_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_sd_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_sd_controlnet_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_sd_faceid_ip_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # Kandinsky
                 if ram_size() >= 16 :
-                    titletab_txt2img_kd = "{"Kandinsky"} 🖼️"
+                    titletab_txt2img_kd = f'{UI_STRINGS["tab_txt2img_kd"]} 🖼️'
                 else :
-                    titletab_txt2img_kd = "{"Kandinsky"} ⛔"
+                    titletab_txt2img_kd = f'{UI_STRINGS["tab_txt2img_kd"]} ⛔'
 
                 with gr.TabItem(titletab_txt2img_kd, id=22) as tab_txt2img_kd:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Kandinsky"}</br>
-                                <b>{"Function : "}</b>{"Generate images from a prompt and a negative prompt using "}Kandinsky</br>
-                                <b>{"Input(s) : "}</b>{"Prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2img_kd"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2img_kd_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2img_kd_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2img_kd_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2img_kd)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- (optional) Modify the settings to use another model, generate several images in a single run or change dimensions of the outputs</br>- Click the <b>generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}</br>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2img_kd_about_instruct"]}</br>
                                 </div>
                                 """
                             )                                
@@ -3895,88 +3899,88 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_txt2img_kd, gs_out_txt2img_kd],
                                 show_progress="full",
                             )                    
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        txt2img_kd_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        txt2img_kd_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_kd_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        txt2img_kd_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        txt2img_kd_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        txt2img_kd_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        txt2img_kd_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        txt2img_kd_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        txt2img_kd_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        txt2img_kd_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        txt2img_kd_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        txt2img_kd_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        txt2img_kd_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        txt2img_kd_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        txt2img_kd_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_kd_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        txt2img_kd_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        txt2img_kd_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        txt2img_kd_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_kd_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_kd_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_kd_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        txt2img_kd_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_kd_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        txt2img_kd_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_kd_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        txt2img_kd_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        txt2img_kd_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_kd_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        txt2img_kd_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        txt2img_kd_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        txt2img_kd_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_kd_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        txt2img_kd_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_kd_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        txt2img_kd_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        txt2img_kd_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        txt2img_kd_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        txt2img_kd_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        txt2img_kd_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        txt2img_kd_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_kd_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        txt2img_kd_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        txt2img_kd_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_kd_txt2vid_ms_input = gr.Button("✍️ >> {"Modelscope"}")
-                                        txt2img_kd_txt2vid_ze_input = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        txt2img_kd_animatediff_lcm_input = gr.Button("✍️ >> {"AnimateDif"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_kd_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        txt2img_kd_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        txt2img_kd_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        txt2img_kd_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        txt2img_kd_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_kd_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_kd_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_kd_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_kd_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_kd_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_kd_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        txt2img_kd_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        txt2img_kd_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_kd_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        txt2img_kd_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        txt2img_kd_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_kd_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        txt2img_kd_controlnet_both = gr.Button("🖼️ + ✍️ >> {"ControlNet"}")
-                                        txt2img_kd_faceid_ip_both = gr.Button("🖼️ + ✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_kd_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_kd_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_kd_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_kd_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_kd_controlnet_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_kd_faceid_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # LCM
-                with gr.TabItem("LCM 🖼️", id=23) as tab_txt2img_lcm:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_txt2img_lcm"], id=23) as tab_txt2img_lcm:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"LCM"}</br>
-                                <b>{"Function : "}</b>{"Generate images from a prompt using "}LCM (Latent Consistency Model)</br>
-                                <b>{"Input(s) : "}</b>{"Prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2img_lcm"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2img_lcm_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2img_lcm_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2img_lcm_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2img_lcm)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- (optional) Modify the settings to generate several images in a single run or change dimensions of the outputs</br>- (optional) Select a LoRA model and set its weight</br>- Fill the <b>prompt</b> with what you want to see in your output image</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery.</br>"}
-                                <b>{"LoRA models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors LoRA models in the directory biniou/models/lora/SD or biniou/models/lora/SDXL (depending on the LoRA model type : SD 1.5 or SDXL). Restart Biniou to see them in the models list."}</br>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2img_lcm_about_instruct"]}</br>
+                                <b>{UI_STRINGS["about_loras"]}</b></br>
+                                - {UI_STRINGS["tab_txt2img_lcm_about_loras_inst1"]}</br>
                                 """
                             )                
                     with gr.Accordion("Settings", open=False):
@@ -4153,86 +4157,86 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_txt2img_lcm, gs_out_txt2img_lcm],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        txt2img_lcm_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        txt2img_lcm_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_lcm_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        txt2img_lcm_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        txt2img_lcm_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        txt2img_lcm_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        txt2img_lcm_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        txt2img_lcm_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        txt2img_lcm_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        txt2img_lcm_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        txt2img_lcm_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        txt2img_lcm_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        txt2img_lcm_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        txt2img_lcm_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        txt2img_lcm_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_lcm_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        txt2img_lcm_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        txt2img_lcm_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        txt2img_lcm_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_lcm_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_lcm_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_lcm_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        txt2img_lcm_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_lcm_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        txt2img_lcm_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_lcm_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        txt2img_lcm_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        txt2img_lcm_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_lcm_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        txt2img_lcm_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        txt2img_lcm_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        txt2img_lcm_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_lcm_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        txt2img_lcm_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_lcm_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        txt2img_lcm_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        txt2img_lcm_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        txt2img_lcm_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        txt2img_lcm_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        txt2img_lcm_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        txt2img_lcm_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_lcm_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        txt2img_lcm_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        txt2img_lcm_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_lcm_txt2vid_ms_input = gr.Button("✍️ >> {"Modelscope"}")
-                                        txt2img_lcm_txt2vid_ze_input = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        txt2img_lcm_animatediff_lcm_input = gr.Button("✍️ >> {"AnimateDif"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_lcm_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        txt2img_lcm_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        txt2img_lcm_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        txt2img_lcm_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        txt2img_lcm_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_lcm_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_lcm_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_lcm_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_lcm_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_lcm_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_lcm_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        txt2img_lcm_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        txt2img_lcm_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_lcm_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        txt2img_lcm_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        txt2img_lcm_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_lcm_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        txt2img_lcm_controlnet_both = gr.Button("🖼️ + ✍️️ >> {"ControlNet"}")
-                                        txt2img_lcm_faceid_ip_both = gr.Button("🖼️ + ✍️️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_lcm_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_lcm_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_lcm_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_lcm_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_lcm_controlnet_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_lcm_faceid_ip_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # txt2img_mjm
-                with gr.TabItem("Midjourney-mini 🖼️", id=24) as tab_txt2img_mjm:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_txt2img_mjm"], id=24) as tab_txt2img_mjm:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Midjourney-mini"}</br>
-                                <b>{"Function : "}</b>{"Generate images from a prompt and a negative prompt using "}Midjourney-mini</br>
-                                <b>{"Input(s) : "}</b>{"Prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2img_mjm"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2img_mjm_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2img_mjm_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2img_mjm_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2img_mjm)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- (optional) Modify the settings to generate several images in a single run or change dimensions of the outputs</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2img_mjm_about_instruct"]}
                                 </br>
                                 """
                             )
@@ -4359,86 +4363,86 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_txt2img_mjm, gs_out_txt2img_mjm],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        txt2img_mjm_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        txt2img_mjm_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_mjm_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        txt2img_mjm_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        txt2img_mjm_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        txt2img_mjm_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        txt2img_mjm_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        txt2img_mjm_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        txt2img_mjm_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        txt2img_mjm_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        txt2img_mjm_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        txt2img_mjm_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        txt2img_mjm_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        txt2img_mjm_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        txt2img_mjm_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_mjm_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        txt2img_mjm_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        txt2img_mjm_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        txt2img_mjm_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_mjm_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_mjm_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_mjm_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        txt2img_mjm_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_mjm_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        txt2img_mjm_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_mjm_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        txt2img_mjm_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        txt2img_mjm_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_mjm_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        txt2img_mjm_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        txt2img_mjm_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        txt2img_mjm_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_mjm_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        txt2img_mjm_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_mjm_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        txt2img_mjm_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        txt2img_mjm_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        txt2img_mjm_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        txt2img_mjm_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        txt2img_mjm_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        txt2img_mjm_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_mjm_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        txt2img_mjm_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        txt2img_mjm_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_mjm_txt2vid_ms_input = gr.Button("✍️ >> {"Modelscope"}")
-                                        txt2img_mjm_txt2vid_ze_input = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        txt2img_mjm_animatediff_lcm_input = gr.Button("✍️ >> {"AnimateDif"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_mjm_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        txt2img_mjm_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        txt2img_mjm_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        txt2img_mjm_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        txt2img_mjm_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_mjm_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_mjm_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_mjm_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_mjm_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_mjm_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_mjm_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        txt2img_mjm_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        txt2img_mjm_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_mjm_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        txt2img_mjm_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        txt2img_mjm_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_mjm_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        txt2img_mjm_controlnet_both = gr.Button("🖼️ + ✍️️ >> {"ControlNet"}")
-                                        txt2img_mjm_faceid_ip_both = gr.Button("🖼️ + ✍️️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_mjm_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_mjm_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_mjm_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_mjm_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_mjm_controlnet_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_mjm_faceid_ip_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # txt2img_paa
-                with gr.TabItem("PixArt-Alpha 🖼️", id=25) as tab_txt2img_paa:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_txt2img_paa"], id=25) as tab_txt2img_paa:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"PixArt-Alpha"}</br>
-                                <b>{"Function : "}</b>{"Generate images from a prompt and a negative prompt using "}PixArt-Alpha</br>
-                                <b>{"Input(s) : "}</b>{"Prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2img_paa"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2img_paa_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2img_paa_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2img_paa_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2img_paa)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- (optional) Modify the settings to use another model, generate several images in a single run or change dimensions of the outputs</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2img_paa_about_instruct"]}
                                 </br>
                                 """
                             )                
@@ -4557,91 +4561,91 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_txt2img_paa, gs_out_txt2img_paa],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        txt2img_paa_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        txt2img_paa_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_paa_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        txt2img_paa_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        txt2img_paa_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        txt2img_paa_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        txt2img_paa_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        txt2img_paa_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        txt2img_paa_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        txt2img_paa_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        txt2img_paa_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        txt2img_paa_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        txt2img_paa_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        txt2img_paa_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        txt2img_paa_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_paa_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        txt2img_paa_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        txt2img_paa_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        txt2img_paa_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_paa_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_paa_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_paa_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        txt2img_paa_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_paa_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        txt2img_paa_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_paa_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        txt2img_paa_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        txt2img_paa_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_paa_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        txt2img_paa_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        txt2img_paa_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        txt2img_paa_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_paa_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        txt2img_paa_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_paa_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        txt2img_paa_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        txt2img_paa_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        txt2img_paa_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        txt2img_paa_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        txt2img_paa_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        txt2img_paa_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_paa_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        txt2img_paa_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        txt2img_paa_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... video module ...")
-                                        txt2img_paa_txt2vid_ms_input = gr.Button("✍️ >> {"Modelscope"}")
-                                        txt2img_paa_txt2vid_ze_input = gr.Button("✍️ >> {"Text2Video-Zero"}")
-                                        txt2img_paa_animatediff_lcm_input = gr.Button("✍️ >> {"AnimateDif"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_paa_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        txt2img_paa_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        txt2img_paa_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        txt2img_paa_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        txt2img_paa_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_paa_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_paa_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_paa_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_paa_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_paa_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2img_paa_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        txt2img_paa_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        txt2img_paa_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2img_paa_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        txt2img_paa_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        txt2img_paa_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        txt2img_paa_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        txt2img_paa_controlnet_both = gr.Button("🖼️ + ✍️️ >> {"Photobooth"}")
-                                        txt2img_paa_faceid_ip_both = gr.Button("🖼️ + ✍️️ >> {"ControlNet"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2img_paa_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        txt2img_paa_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        txt2img_paa_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        txt2img_paa_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        txt2img_paa_controlnet_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        txt2img_paa_faceid_ip_both = gr.Button(f'🖼️ + ✍️️ >> {UI_STRINGS["tab_faceid_ip"]}')
 # img2img
-                with gr.TabItem("Img2img 🖌️", id=26) as tab_img2img:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_img2img"], id=26) as tab_img2img:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Img2img"}</br>
-                                <b>{"Function : "}</b>{"Generate images variations of an input image, from a prompt and a negative prompt using "}Stable Diffusion</br>
-                                {"You could use this module to refine an image produced by another module."}</br>
-                                <b>{"Input(s) : "}</b>{"Input image, prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_img2img"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_img2img_about_desc"]}</br>
+                                {UI_STRINGS["tab_img2img_about_desc2"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_img2img_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_img2img_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_img2img)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- (optional) Modify the settings to use another model, generate several images in a single run</br>- (optional) Select a LoRA model and set its weight</br>- Upload, import an image or draw a sketch as an <b>Input image</b></br>- Set the balance between the input image and the prompt (<b>denoising strength</b>) to a value between 0 and 1 : 0 will completely ignore the prompt, 1 will completely ignore the input image</br>- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_img2img_about_instruct"]}
                                 </br>
-                                <b>{"Models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list."}</br>
-                                <b>{"LoRA models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors LoRA models in the directory biniou/models/lora/SD or biniou/models/lora/SDXL (depending on the LoRA model type : SD 1.5 or SDXL). Restart Biniou to see them in the models list."}</br>
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_img2img_about_models_inst1"]}</br>
+                                <b>{UI_STRINGS["about_loras"]}</b></br>
+                                - {UI_STRINGS["tab_img2img_about_loras_inst1"]}</br>
                                 </div>
                                 """
                             )               
@@ -4847,81 +4851,81 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_img2img, gs_out_img2img], 
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        img2img_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        img2img_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        img2img_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        img2img_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        img2img_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        img2img_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        img2img_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        img2img_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        img2img_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        img2img_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        img2img_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        img2img_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        img2img_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        img2img_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        img2img_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        img2img_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        img2img_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        img2img_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        img2img_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        img2img_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        img2img_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        img2img_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        img2img_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2img_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2img_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        img2img_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        img2img_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        img2img_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2img_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        img2img_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        img2img_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        img2img_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        img2img_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        img2img_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        img2img_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        img2img_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        img2img_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        img2img_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        img2img_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        img2img_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        img2img_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        img2img_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        img2img_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        img2img_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        img2img_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        img2img_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        img2img_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        img2img_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        img2img_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2img_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2img_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2img_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        img2img_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        img2img_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        img2img_controlnet_both = gr.Button("🖼️ + ✍️ >> {"ControlNet"}")
-                                        img2img_faceid_ip_both = gr.Button("🖼️ + ✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        img2img_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2img_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2img_controlnet_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2img_faceid_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # img2img_ip
-                with gr.TabItem("IP-Adapter 🖌️", id=27) as tab_img2img_ip:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_img2img_ip"], id=27) as tab_img2img_ip:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"IP-Adapter"}</br>
-                                <b>{"Function : "}</b>{"Transform an input image, with a conditional IP-Adapter image, a prompt and a negative prompt using "}Stable Diffusion, IP-Adapter, ostris/ip-composition-adapter</br>
-                                <b>{"Input(s) : "}</b>{"Input image, conditional IP-Adapter image, prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_img2img_ip"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_img2img_ip_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_img2img_ip_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_img2img_ip_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_img2img_ip)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- (optional) Modify the settings to use another model or generate several images in a single run</br>- (optional) Select a LoRA model and set its weight</br>- Select the IP-Adapter type to use : standard (image to image + prompt) or composition (import composition into the output image)</br>- Upload or import an image as an <b>Input image</b> (if using standard IP-Adapter)</br>- Upload an image as an <b>IP-Adapter image</b></br>- Set the balance between the input image and the prompts (Ip-Adapter image, prompts, negative prompt) by choosing a <b>denoising strength</b> value between 0.01 and 1 : 0.01 will mostly ignore the prompts, 1 will completely ignore the input image</br>- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery.</br>"}
-                                <b>{"LoRA models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors LoRA models in the directory biniou/models/lora/SD or biniou/models/lora/SDXL (depending on the LoRA model type : SD 1.5 or SDXL). Restart Biniou to see them in the models list."}</br>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_img2img_ip_about_instruct"]}
+                                <b>{UI_STRINGS["about_loras"]}</b></br>
+                                - {UI_STRINGS["tab_img2img_ip_about_loras_inst1"]}</br>
                                 </br>
                                 """
                             )
@@ -5153,84 +5157,84 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_img2img_ip, gs_out_img2img_ip],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        img2img_ip_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        img2img_ip_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        img2img_ip_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        img2img_ip_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        img2img_ip_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        img2img_ip_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        img2img_ip_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        img2img_ip_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        img2img_ip_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        img2img_ip_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        img2img_ip_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        img2img_ip_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        img2img_ip_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        img2img_ip_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        img2img_ip_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        img2img_ip_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        img2img_ip_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        img2img_ip_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        img2img_ip_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        img2img_ip_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        img2img_ip_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        img2img_ip_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        img2img_ip_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2img_ip_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2img_ip_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        img2img_ip_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        img2img_ip_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        img2img_ip_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2img_ip_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        img2img_ip_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        img2img_ip_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        img2img_ip_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        img2img_ip_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        img2img_ip_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        img2img_ip_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        img2img_ip_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        img2img_ip_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        img2img_ip_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        img2img_ip_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        img2img_ip_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        img2img_ip_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        img2img_ip_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        img2img_ip_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        img2img_ip_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        img2img_ip_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        img2img_ip_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        img2img_ip_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        img2img_ip_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        img2img_ip_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2img_ip_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2img_ip_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2img_ip_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        img2img_ip_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        img2img_ip_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        img2img_ip_controlnet_both = gr.Button("🖼️ + ✍️ >> {"ControlNet"}")
-                                        img2img_ip_faceid_ip_both = gr.Button("🖼️ + ✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        img2img_ip_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2img_ip_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2img_ip_controlnet_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2img_ip_faceid_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # img2var
                 if ram_size() >= 16 :
-                    titletab_img2var = "{"Image variation"} 🖼️"
+                    titletab_img2var = f'{UI_STRINGS["tab_img2var"]} 🖼️'
                 else :
-                    titletab_img2var = "{"Image variation"} ⛔"
+                    titletab_img2var = f'{UI_STRINGS["tab_img2var"]} ⛔'
 
                 with gr.TabItem(titletab_img2var, id=28) as tab_img2var: 
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Image variation"}</br>
-                                <b>{"Function : "}</b>{"Generate variations of an input image using "}Stable Diffusion</br>
-                                <b>{"Input(s) : "}</b>{"Input image"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_img2var"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_img2var_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_img2var_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_img2var_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_img2var)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload or import an image as an <b>Input image</b></br>- (optional) Modify the settings to generate several images in a single run</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_img2var_about_instruct"]}
                                 </br>
                                 """
                             )
@@ -5345,66 +5349,66 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_img2var, gs_out_img2var], 
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        img2var_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        img2var_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        img2var_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        img2var_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        img2var_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        img2var_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        img2var_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        img2var_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        img2var_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        img2var_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        img2var_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        img2var_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        img2var_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        img2var_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        img2var_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        img2var_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        img2var_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        img2var_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        img2var_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        img2var_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        img2var_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        img2var_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        img2var_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        img2var_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        img2var_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        img2var_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        img2var_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        img2var_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        img2var_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        img2var_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        img2var_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        img2var_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        img2var_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        img2var_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
                                        
 
 # pix2pix    
-                with gr.TabItem("Instruct pix2pix 🖌️", id=29) as tab_pix2pix:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_pix2pix"], id=29) as tab_pix2pix:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Instruct pix2pix"}</br>
-                                <b>{"Function : "}</b>{"Edit an input image with instructions from a prompt and a negative prompt using "}Instructpix2pix</br>
-                                <b>{"Input(s) : "}</b>{"Input image, prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_pix2pix"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_pix2pix_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_pix2pix_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_pix2pix_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_pix2pix)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload or import an image using the <b>Input image</b> field</br>- Fill the <b>prompt</b> with the instructions for modifying your input image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- (optional) Modify the settings to change image CFG scale or generate several images in a single run</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery</br></br>"}
-                                <b>{"Examples :"}</b>InstructPix2Pix : Learning to Follow Image Editing Instructions
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_pix2pix_about_instruct"]}</br></br>
+                                <b>{UI_STRINGS["about_examples"]}</b><a href ='https://www.timothybrooks.com/instruct-pix2pix/' target='_blank'>{UI_STRINGS["tab_pix2pix_about_examples_text"]}</a>
                                 </div>
                                 """
                             )                
@@ -5533,83 +5537,83 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_pix2pix, gs_out_pix2pix],
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        pix2pix_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        pix2pix_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        pix2pix_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        pix2pix_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        pix2pix_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        pix2pix_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        pix2pix_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        pix2pix_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        pix2pix_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        pix2pix_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        pix2pix_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        pix2pix_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        pix2pix_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        pix2pix_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        pix2pix_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        pix2pix_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        pix2pix_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        pix2pix_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        pix2pix_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        pix2pix_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        pix2pix_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        pix2pix_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        pix2pix_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        pix2pix_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        pix2pix_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        pix2pix_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        pix2pix_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        pix2pix_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        pix2pix_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        pix2pix_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        pix2pix_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        pix2pix_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        pix2pix_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        pix2pix_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        pix2pix_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        pix2pix_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        pix2pix_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        pix2pix_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        pix2pix_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        pix2pix_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        pix2pix_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        pix2pix_inpaint_input = gr.Button("✍️ >> {"Inpaint"}")
-                                        pix2pix_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        pix2pix_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
-                                        gr.HTML(value="... video module ...")
-                                        pix2pix_vid2vid_ze_input = gr.Button("✍️ >> {"Video Instruct-Pix2Pix"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        pix2pix_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        pix2pix_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        pix2pix_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        pix2pix_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        pix2pix_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        pix2pix_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        pix2pix_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        pix2pix_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        pix2pix_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        pix2pix_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        pix2pix_vid2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_vid2vid_ze"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        pix2pix_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        pix2pix_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        pix2pix_inpaint_both = gr.Button("🖼️ + ✍️ >> {"Inpaint"}")
-                                        pix2pix_controlnet_both = gr.Button("🖼️ + ✍️ >> {"ControlNet"}")
-                                        pix2pix_faceid_ip_both = gr.Button("🖼️ + ✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        pix2pix_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        pix2pix_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        pix2pix_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        pix2pix_controlnet_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        pix2pix_faceid_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 # magicmix
-                with gr.TabItem("MagicMix 🖌️", id=291) as tab_magicmix:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_magicmix"], id=291) as tab_magicmix:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"MagicMix"}</br>
-                                <b>{"Function : "}</b>{"Edit an input image with instructions from a prompt using "}MagicMix, Stable Diffusion</br>
-                                <b>{"Input(s) : "}</b>{"Input image, prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_magicmix"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_magicmix_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_magicmix_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_magicmix_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_magicmix)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload or import an image using the <b>Input image</b> field</br>- Adjust the <b>Mix Factor</b> slider to create a balance between input image and prompt</br>- Fill the <b>prompt</b> with the instructions for modifying your input image. Use simple prompt instruction (e.g. 'a dog')</br>- (optional) Modify the settings to generate several images in a single run or generate several images in a single run</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery</br></br>"}
-                                <b>{"Examples :"}</b><a href ='https://magicmix.github.io/' target='_blank'>MagicMix: Semantic Mixing with Diffusion Models</a>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_magicmix_about_instruct"]}</br></br>
+                                <b>{UI_STRINGS["about_examples"]}</b><a href ='https://magicmix.github.io/' target='_blank'>{UI_STRINGS["tab_magicmix_about_examples_text"]}</a>
                                 </div>
                                 """
                             )
@@ -5726,67 +5730,67 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_magicmix, gs_out_magicmix],
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        magicmix_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        magicmix_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        magicmix_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        magicmix_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        magicmix_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        magicmix_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        magicmix_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        magicmix_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        magicmix_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        magicmix_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        magicmix_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        magicmix_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        magicmix_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        magicmix_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        magicmix_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        magicmix_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        magicmix_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        magicmix_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        magicmix_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        magicmix_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        magicmix_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        magicmix_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        magicmix_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        magicmix_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        magicmix_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        magicmix_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        magicmix_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        magicmix_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        magicmix_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        magicmix_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        magicmix_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        magicmix_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        magicmix_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        magicmix_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # inpaint
-                with gr.TabItem("Inpaint 🖌️", id=292) as tab_inpaint:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_inpaint"], id=292) as tab_inpaint:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Inpaint"}</br>
-                                <b>{"Function : "}</b>{"Inpaint the masked area of an input image, from a prompt and a negative prompt using "}Stable Diffusion</br>
-                                <b>{"Input(s) : "}</b>{"Input image, inpaint masked area, prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_inpaint"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_inpaint_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_inpaint_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_inpaint_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_inpaint)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload or import an image using the <b>Input image</b> field</br>- Using the sketch tool of the <b>inpaint field</b>, mask the area to be modified</br>- Modify the <b>denoising strength of the inpainted area</b> : 0 will keep the original content, 1 will ignore it</br>- Fill <b>the prompt</b> with what you want to see in your WHOLE (not only the inpaint area) output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- (optional) Modify the settings to use another model or generate several images in a single run</br>- Click the <b>Generate button</b></br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_inpaint_about_instruct"]}
                                 </br>
-                                <b>{"Models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list."}
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_inpaint_about_models_inst1"]}
                                 </div>
                                 """
                             )                   
@@ -5927,86 +5931,86 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_inpaint, gs_out_inpaint], 
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        inpaint_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        inpaint_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        inpaint_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        inpaint_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        inpaint_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        inpaint_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        inpaint_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        inpaint_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        inpaint_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        inpaint_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        inpaint_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        inpaint_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        inpaint_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        inpaint_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        inpaint_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        inpaint_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        inpaint_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        inpaint_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        inpaint_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        inpaint_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        inpaint_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        inpaint_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        inpaint_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        inpaint_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        inpaint_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        inpaint_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        inpaint_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        inpaint_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        inpaint_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        inpaint_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        inpaint_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        inpaint_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        inpaint_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        inpaint_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        inpaint_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        inpaint_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        inpaint_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        inpaint_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        inpaint_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        inpaint_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        inpaint_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        inpaint_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        inpaint_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        inpaint_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        inpaint_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        inpaint_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        inpaint_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        inpaint_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        inpaint_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        inpaint_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        inpaint_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        inpaint_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        inpaint_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        inpaint_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        inpaint_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        inpaint_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        inpaint_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        inpaint_controlnet_both = gr.Button("🖼️ + ✍️ >> {"ControlNet"}")
-                                        inpaint_faceid_ip_both = gr.Button("🖼️ + ✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        inpaint_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        inpaint_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        inpaint_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        inpaint_controlnet_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        inpaint_faceid_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 # paintbyex
                 if ram_size() >= 16 :
-                    titletab_paintbyex = "{"Paint by example"} 🖌️"
+                    titletab_paintbyex = f'{UI_STRINGS["tab_paintbyex"]} 🖌️'
                 else :
-                    titletab_paintbyex = "{"Paint by example"} ⛔"
+                    titletab_paintbyex = f'{UI_STRINGS["tab_paintbyex"]} ⛔'
 
                 with gr.TabItem(titletab_paintbyex, id=293) as tab_paintbyex:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Paint by example"}</br>
-                                <b>{"Function : "}</b>{"Paint the masked area of an input image, from an example image using "}Paint by example, Stable Diffusion</br>
-                                <b>{"Input(s) : "}</b>{"Input image, masked area, example image"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_paintbyex"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_paintbyex_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_paintbyex_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_paintbyex_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_paintbyex)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload or import an image using the <b>Input image</b> field</br>- Using the sketch tool of the <b>Input image field</b>, mask the area to be modified</br>- Upload or import an example image using the <b>Example image</b> field. This image will be used as an example on how to modify the masked area of the input image</br>- (optional) Modify the settings to generate several images in a single run</br>- Click the <b>Generate button</b></br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_paintbyex_about_instruct"]}
                                 </br>
                                 </div>
                                 """
@@ -6130,71 +6134,71 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_paintbyex, gs_out_paintbyex], 
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():                                
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        paintbyex_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        paintbyex_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        paintbyex_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        paintbyex_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        paintbyex_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        paintbyex_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        paintbyex_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        paintbyex_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        paintbyex_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        paintbyex_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        paintbyex_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        paintbyex_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        paintbyex_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        paintbyex_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        paintbyex_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        paintbyex_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        paintbyex_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        paintbyex_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        paintbyex_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        paintbyex_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        paintbyex_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        paintbyex_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        paintbyex_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        paintbyex_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        paintbyex_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        paintbyex_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        paintbyex_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        paintbyex_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        paintbyex_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        paintbyex_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        paintbyex_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        paintbyex_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        paintbyex_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        paintbyex_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box(): 
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # outpaint
                 if ram_size() >= 16 :
-                    titletab_outpaint = "{"Outpaint"} 🖌️"
+                    titletab_outpaint = f'{UI_STRINGS["tab_outpaint"]} 🖌️'
                 else :
-                    titletab_outpaint = "{"Outpaint"} ⛔"
+                    titletab_outpaint = f'{UI_STRINGS["tab_outpaint"]} ⛔'
 
                 with gr.TabItem(titletab_outpaint, id=294) as tab_outpaint:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"Outpaint"}</br>
-                                <b>{"Function : "}</b>{"Outpaint an input image, by defining borders and using a prompt and a negative prompt, with "}Stable Diffusion</br>
-                                <b>{"Input(s) : "}</b>{"Input image, outpaint mask, prompt, negative prompt"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_outpaint"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_outpaint_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_outpaint_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_outpaint_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_outpaint)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- Upload or import an image using the <b>Input image</b> field</br>- Define the size in pixels of the borders to add for top, bottom, left and right sides</br>- Click the <b>Create mask</b> button to add borders to your image and generate a mask</br>- Modify the <b>denoising strength of the outpainted area</b> : 0 will keep the original content, 1 will ignore it</br>- Fill <b>the prompt</b> with what you want to see in your WHOLE (not only the outpaint area) output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- (optional) Modify the settings to use another model or generate several images in a single run</br>- Click the <b>Generate button</b></br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery."}
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_outpaint_about_instruct"]}
                                 </br>
-                                <b>{"Models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list."}
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_outpaint_about_models_inst1"]}
                                 </div>
                                 """
                             )                   
@@ -6357,86 +6361,86 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_outpaint, gs_out_outpaint], 
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():                                
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        outpaint_llava = gr.Button("🖼️ >> {"Llava (gguf)"}")
-                                        outpaint_img2txt_git = gr.Button("🖼️ >> {"Image captioning"}")
-                                        gr.HTML(value="... image module ...")
-                                        outpaint_img2img = gr.Button("🖼️ >> {"Img2img"}")
-                                        outpaint_img2img_ip = gr.Button("🖼️ >> {"IP-Adapter"}")
-                                        outpaint_img2var = gr.Button("🖼️ >> {"Image variation"}")
-                                        outpaint_pix2pix = gr.Button("🖼️ >> {"Instruct pix2pix"}")
-                                        outpaint_magicmix = gr.Button("🖼️ >> {"MagicMix"}")
-                                        outpaint_inpaint = gr.Button("🖼️ >> {"Inpaint"}")
-                                        outpaint_paintbyex = gr.Button("🖼️ >> {"Paint by example"}")
-                                        outpaint_outpaint = gr.Button("🖼️ >> {"Outpaint"}")
-                                        outpaint_controlnet = gr.Button("🖼️ >> {"ControlNet"}")
-                                        outpaint_faceid_ip = gr.Button("🖼️ >> {"Photobooth"}")
-                                        outpaint_faceswap = gr.Button("🖼️ >> {"Faceswap"}")
-                                        outpaint_resrgan = gr.Button("🖼️ >> {"Real ESRGAN"}")
-                                        outpaint_gfpgan = gr.Button("🖼️ >> {"GFPGAN"}")
-                                        gr.HTML(value="... video module ...")
-                                        outpaint_img2vid = gr.Button("🖼️ >> {"Stable Video Diffusion"}")
-                                        gr.HTML(value="... 3d module ...")
-                                        outpaint_img2shape = gr.Button("🖼️ >> {"Shap-E img2shape"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        outpaint_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        outpaint_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        outpaint_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        outpaint_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        outpaint_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        outpaint_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        outpaint_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        outpaint_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        outpaint_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        outpaint_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        outpaint_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        outpaint_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        outpaint_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        outpaint_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        outpaint_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        outpaint_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        outpaint_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        outpaint_txt2img_sd_input = gr.Button("✍️ >> {"Stable Diffusion"}")
-                                        outpaint_txt2img_kd_input = gr.Button("✍️ >> {"Kandinsky"}")
-                                        outpaint_txt2img_lcm_input = gr.Button("✍️ >> {"LCM"}")
-                                        outpaint_txt2img_mjm_input = gr.Button("✍️ >> {"Midjourney-mini"}")
-                                        outpaint_txt2img_paa_input = gr.Button("✍️ >> {"PixArt-Alpha"}")
-                                        outpaint_img2img_input = gr.Button("✍️ >> {"Img2img"}")
-                                        outpaint_img2img_ip_input = gr.Button("✍️ >> {"IP-Adapter"}")
-                                        outpaint_pix2pix_input = gr.Button("✍️ >> {"Instruct pix2pix"}")
-                                        outpaint_controlnet_input = gr.Button("✍️ >> {"ControlNet"}")
-                                        outpaint_faceid_ip_input = gr.Button("✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        outpaint_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        outpaint_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        outpaint_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        outpaint_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        outpaint_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        outpaint_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        outpaint_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        outpaint_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        outpaint_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        outpaint_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        outpaint_img2img_both = gr.Button("🖼️ + ✍️ >> {"Img2img"}")
-                                        outpaint_img2img_ip_both = gr.Button("🖼️ + ✍️ >> {"IP-Adapter"}")
-                                        outpaint_pix2pix_both = gr.Button("🖼️ + ✍️ >> {"Instruct pix2pix"}")
-                                        outpaint_controlnet_both = gr.Button("🖼️ + ✍️ >> {"ControlNet"}")
-                                        outpaint_faceid_ip_both = gr.Button("🖼️ + ✍️ >> {"Photobooth"}")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        outpaint_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        outpaint_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        outpaint_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        outpaint_controlnet_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        outpaint_faceid_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 # ControlNet
-                with gr.TabItem("ControlNet 🖼️", id=295) as tab_controlnet:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_controlnet"], id=295) as tab_controlnet:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Informations"}</h1>
-                                <b>{"Module : "}</b>{"ControlNet"}</br>
-                                <b>{"Function : "}</b>{"Generate images from a prompt, a negative prompt and a control image using "}Stable Diffusion, ControlNet</br>
-                                <b>{"Input(s) : "}</b>{"Prompt, negative prompt, ControlNet input"}</br>
-                                <b>{"Output(s) : "}</b>{"Image(s)"}</br>
-                                <b>{"HF model page : "}</b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_controlnet"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_controlnet_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_controlnet_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_controlnet_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_controlnet)}<br />
-                                <b>HF ControlNet models pages : </b>
+                                <b>{UI_STRINGS["about_modelpage_controlnet"]}</b>
                                 {autodoc(variant_list_controlnet)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>{"Help"}</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>{"Usage :"}</b></br>
-                                {"- (optional) Modify the settings to use another model, change the settings for ControlNet or adjust threshold on canny</br>- (optional) Select a LoRA model and set its weight</br>- Select a <b>Source image</b> that will be used to generate the control image</br>- Select a <b>pre-processor</b> for the control image</br>- Click the <b>Preview</b> button</br>- If the <b>Control image</b> generated suits your needs, continue. Else, you could modify the settings and generate a new one</br>- You should not modifiy the value in the <b>ControlNet Model</b> field, as it is automatically selected from the used pre-processor</br>- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- Click the <b>Generate button</b></br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery</br>"}
-                                <b>{"Models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list."}</br>
-                                <b>{"LoRA models :"}</b></br>
-                                - {"You could place huggingface.co or civitai.com Stable diffusion based safetensors LoRA models in the directory biniou/models/lora/SD or biniou/models/lora/SDXL (depending on the LoRA model type : SD 1.5 or SDXL). Restart Biniou to see them in the models list."}</br>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_controlnet_about_instruct"]}
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_controlnet_about_models_inst1"]}</br>
+                                <b>{UI_STRINGS["about_loras"]}</b></br>
+                                - {UI_STRINGS["tab_controlnet_about_loras_inst1"]}</br>
                                 </div>
                                 """
                             )                
@@ -6683,91 +6687,91 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_controlnet, gs_out_controlnet],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        controlnet_llava = gr.Button("🖼️ >> Llava (gguf)")
-                                        controlnet_img2txt_git = gr.Button("🖼️ >> Image captioning")
-                                        gr.HTML(value="... image module ...")
-                                        controlnet_img2img = gr.Button("🖼️ >> Img2img")
-                                        controlnet_img2img_ip = gr.Button("🖼️ >> IP-Adapter")
-                                        controlnet_img2var = gr.Button("🖼️ >> Image variation")
-                                        controlnet_pix2pix = gr.Button("🖼️ >> Instruct pix2pix")
-                                        controlnet_magicmix = gr.Button("🖼️ >> MagicMix")
-                                        controlnet_inpaint = gr.Button("🖼️ >> Inpaint")
-                                        controlnet_paintbyex = gr.Button("🖼️ >> Paint by example")
-                                        controlnet_outpaint = gr.Button("🖼️ >> Outpaint")
-                                        controlnet_controlnet = gr.Button("🖼️ >> ControlNet")
-                                        controlnet_faceid_ip = gr.Button("🖼️ >> Photobooth")
-                                        controlnet_faceswap = gr.Button("🖼️ >> Faceswap")
-                                        controlnet_resrgan = gr.Button("🖼️ >> Real ESRGAN")
-                                        controlnet_gfpgan = gr.Button("🖼️ >> GFPGAN")
-                                        gr.HTML(value="... video module ...")
-                                        controlnet_img2vid = gr.Button("🖼️ >> Stable Video Diffusion")
-                                        gr.HTML(value="... 3d module ...")
-                                        controlnet_img2shape = gr.Button("🖼️ >> Shap-E img2shape")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        controlnet_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        controlnet_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        controlnet_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        controlnet_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        controlnet_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        controlnet_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        controlnet_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        controlnet_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        controlnet_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        controlnet_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        controlnet_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        controlnet_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        controlnet_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        controlnet_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        controlnet_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        controlnet_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        controlnet_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        controlnet_txt2img_sd_input = gr.Button("✍️ >> Stable Diffusion")
-                                        controlnet_txt2img_kd_input = gr.Button("✍️ >> Kandinsky")
-                                        controlnet_txt2img_lcm_input = gr.Button("✍️ >> LCM")
-                                        controlnet_txt2img_mjm_input = gr.Button("✍️ >> Midjourney-mini")
-                                        controlnet_txt2img_paa_input = gr.Button("✍️ >> PixArt-Alpha")
-                                        controlnet_img2img_input = gr.Button("✍️ >> Img2img")
-                                        controlnet_img2img_ip_input = gr.Button("✍️ >> IP-Adapter")
-                                        controlnet_pix2pix_input = gr.Button("✍️ >> Instruct pix2pix")
-                                        controlnet_inpaint_input = gr.Button("✍️ >> Inpaint")
-                                        controlnet_faceid_ip_input = gr.Button("✍️ >> Photobooth")
-                                        gr.HTML(value="... video module ...")
-                                        controlnet_txt2vid_ms_input = gr.Button("✍️ >> Modelscope")
-                                        controlnet_txt2vid_ze_input = gr.Button("✍️ >> Text2Video-Zero")
-                                        controlnet_animatediff_lcm_input = gr.Button("✍️ >> AnimateDiff")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        controlnet_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        controlnet_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        controlnet_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        controlnet_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        controlnet_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        controlnet_img2img_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        controlnet_img2img_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        controlnet_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        controlnet_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        controlnet_faceid_ip_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        controlnet_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        controlnet_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        controlnet_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        controlnet_img2img_both = gr.Button("🖼️ + ✍️ >> Img2img")
-                                        controlnet_img2img_ip_both = gr.Button("🖼️ + ✍️ >> IP-Adapter")
-                                        controlnet_pix2pix_both = gr.Button("🖼️ + ✍️ >> Instruct pix2pix")
-                                        controlnet_inpaint_both = gr.Button("🖼️ + ✍️ >> Inpaint")
-                                        controlnet_faceid_ip_both = gr.Button("🖼️ + ✍️ >> Photobooth")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        controlnet_img2img_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img"]}')
+                                        controlnet_img2img_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        controlnet_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        controlnet_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        controlnet_faceid_ip_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_faceid_ip"]}')
 
 
 # faceid_ip
-                with gr.TabItem("Photobooth 🖼️", id=296) as tab_faceid_ip:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_faceid_ip"], id=296) as tab_faceid_ip:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Photobooth</br>
-                                <b>Function : </b>Generate portraits using the face taken from the input image, a prompt and a negative prompt using Stable Diffusion, IP-Adapter FaceID, Insight face, Photomaker.</br>
-                                <b>Input(s) : </b>Input image, prompt, negative prompt</br>
-                                <b>Output(s) : </b>Image(s)</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_faceid_ip"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_faceid_ip_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_faceid_ip_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_faceid_ip_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_faceid_ip)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - (optional) Modify the settings to use another model, generate several images in a single run</br>- (optional) Select a LoRA model and set its weight</br>- Upload or import an image using the <b>Input image</b> field</br>- Set the the input image strength : lower values give more creativity to the portrait, higher values more fidelity to the input image.</br>- Fill the <b>prompt</b> with what you want to see in your output image</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output image</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_faceid_ip_about_instruct"]}
                                 </br>
-                                <b>Models :</b></br>
-                                - You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list.</br>
-                                <b>LoRA models :</b></br>
-                                - You could place huggingface.co or civitai.com Stable diffusion based safetensors LoRA models in the directory biniou/models/lora/SD or biniou/models/lora/SDXL (depending on the LoRA model type : SD 1.5 or SDXL). Restart Biniou to see them in the models list.</br>
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_faceid_ip_about_models_inst1"]}</br>
+                                <b>{UI_STRINGS["about_loras"]}</b></br>
+                                - {UI_STRINGS["tab_faceid_ip_about_loras_inst1"]}</br>
                                 </div>
                                 """
                             )               
@@ -6966,77 +6970,77 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_faceid_ip, gs_out_faceid_ip],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        faceid_ip_llava = gr.Button("🖼️ >> Llava (gguf)")
-                                        faceid_ip_img2txt_git = gr.Button("🖼️ >> Image captioning")
-                                        gr.HTML(value="... image module ...")
-                                        faceid_ip_img2img = gr.Button("🖼️ >> Img2img")
-                                        faceid_ip_img2img_ip = gr.Button("🖼️ >> IP-Adapter")
-                                        faceid_ip_img2var = gr.Button("🖼️ >> Image variation")
-                                        faceid_ip_pix2pix = gr.Button("🖼️ >> Instruct pix2pix")
-                                        faceid_ip_inpaint = gr.Button("🖼️ >> Inpaint")
-                                        faceid_ip_magicmix = gr.Button("🖼️ >> MagicMix")
-                                        faceid_ip_paintbyex = gr.Button("🖼️ >> Paint by example")
-                                        faceid_ip_outpaint = gr.Button("🖼️ >> Outpaint")
-                                        faceid_ip_controlnet = gr.Button("🖼️ >> ControlNet")
-                                        faceid_ip_faceid_ip = gr.Button("🖼️ >> Photobooth")
-                                        faceid_ip_faceswap = gr.Button("🖼️ >> Faceswap")
-                                        faceid_ip_resrgan = gr.Button("🖼️ >> Real ESRGAN")
-                                        faceid_ip_gfpgan = gr.Button("🖼️ >> GFPGAN")
-                                        gr.HTML(value="... video module ...")
-                                        faceid_ip_img2vid = gr.Button("🖼️ >> Stable Video Diffusion")
-                                        gr.HTML(value="... 3d module ...")
-                                        faceid_ip_img2shape = gr.Button("🖼️ >> Shap-E img2shape")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        faceid_ip_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        faceid_ip_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        faceid_ip_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        faceid_ip_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        faceid_ip_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        faceid_ip_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        faceid_ip_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        faceid_ip_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        faceid_ip_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        faceid_ip_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        faceid_ip_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        faceid_ip_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        faceid_ip_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        faceid_ip_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        faceid_ip_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        faceid_ip_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        faceid_ip_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        faceid_ip_txt2img_sd_input = gr.Button("✍️ >> Stable Diffusion")
-                                        faceid_ip_txt2img_kd_input = gr.Button("✍️ >> Kandinsky")
-                                        faceid_ip_txt2img_lcm_input = gr.Button("✍️ >> LCM")
-                                        faceid_ip_txt2img_mjm_input = gr.Button("✍️ >> Midjourney-mini")
-                                        faceid_ip_txt2img_paa_input = gr.Button("✍️ >> PixArt-Alpha")
-                                        faceid_ip_pix2pix_input = gr.Button("✍️ >> Instruct pix2pix")
-                                        faceid_ip_inpaint_input = gr.Button("✍️ >> Inpaint")
-                                        faceid_ip_controlnet_input = gr.Button("✍️ >> ControlNet")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        faceid_ip_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        faceid_ip_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        faceid_ip_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        faceid_ip_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        faceid_ip_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        faceid_ip_pix2pix_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        faceid_ip_inpaint_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        faceid_ip_controlnet_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_controlnet"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
-                                        gr.HTML(value="... image module ...")
-                                        faceid_ip_pix2pix_both = gr.Button("🖼️ + ✍️ >> Instruct pix2pix")
-                                        faceid_ip_inpaint_both = gr.Button("🖼️ + ✍️ >> Inpaint")
-                                        faceid_ip_controlnet_both = gr.Button("🖼️ + ✍️ >> ControlNet")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        faceid_ip_pix2pix_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        faceid_ip_inpaint_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        faceid_ip_controlnet_both = gr.Button(f'🖼️ + ✍️ >> {UI_STRINGS["tab_controlnet"]}')
 
 # faceswap    
-                with gr.TabItem("Faceswap 🎭", id=297) as tab_faceswap:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_faceswap"], id=297) as tab_faceswap:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Faceswap</br>
-                                <b>Function : </b>Swap faces between images (source -> target) using Insight Face, Onnx runtime</br>
-                                <b>Input(s) : </b>Source image, target image</br>
-                                <b>Output(s) : </b>Image(s)</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_faceswap"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_faceswap_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_faceswap_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_faceswap_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_faceswap.keys())}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Upload a <b>Source image</b>. The face(s) in this image will replaces face(s) in the target image.</br>- Upload or import a <b>target image</b>. The face(s) in this image will be replaced with the source one(s)</br>- Set the <b>source index</b> list to choose which face(s) to extract from source image and in which order. From left to right and starting from 0, id comma separated list of faces number. For example, if there is 3 faces in a picture '0,2' will select the face on the left, then on the right, but not on the one in the middle. If set to 0, take only the first face from the left.</br>- Set the <b>target index</b> list to choose which face(s) to replace in target image and in which order. From left to right and starting from 0, id comma separated list of faces number. For example, if there is 3 faces in a picture '2,1' will select the faces on the right, then in the middle, but not the one on the left. The source index list is used to create a mapping between the faces to extract and to replace. If set to 0, replace only the first face from the left.</br>- (optional) Modify the settings to desactivate GFPGAN faces restoration</br>- Click the <b>Generate</b> button</br>- After generation, generated images are displayed in the gallery. Save them individually or create a downloadable zip of the whole gallery.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_faceswap_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -7129,64 +7133,64 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_faceswap, gs_out_faceswap],
                                 show_progress="full",
                             )  
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        faceswap_llava = gr.Button("🖼️ >> Llava (gguf)")
-                                        faceswap_img2txt_git = gr.Button("🖼️ >> Image captioning")
-                                        gr.HTML(value="... image module ...")
-                                        faceswap_img2img = gr.Button("🖼️ >> Img2img")
-                                        faceswap_img2img_ip = gr.Button("🖼️ >> IP-Adapter")
-                                        faceswap_img2var = gr.Button("🖼️ >> Image variation")
-                                        faceswap_pix2pix = gr.Button("🖼️ >> Instruct pix2pix")
-                                        faceswap_magicmix = gr.Button("🖼️ >> MagicMix")
-                                        faceswap_inpaint = gr.Button("🖼️ >> Inpaint")
-                                        faceswap_paintbyex = gr.Button("🖼️ >> Paint by example")
-                                        faceswap_outpaint = gr.Button("🖼️ >> Outpaint")
-                                        faceswap_controlnet = gr.Button("🖼️ >> ControlNet")
-                                        faceswap_faceid_ip = gr.Button("🖼️ >> Photobooth")
-                                        faceswap_faceswap = gr.Button("🖼️ >> Faceswap")
-                                        faceswap_resrgan = gr.Button("🖼️ >> Real ESRGAN")
-                                        faceswap_gfpgan = gr.Button("🖼️ >> GFPGAN")
-                                        gr.HTML(value="... video module ...")
-                                        faceswap_img2vid = gr.Button("🖼️ >> Stable Video Diffusion")
-                                        gr.HTML(value="... 3d module ...")
-                                        faceswap_img2shape = gr.Button("🖼️ >> Shap-E img2shape")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        faceswap_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        faceswap_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        faceswap_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        faceswap_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        faceswap_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        faceswap_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        faceswap_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        faceswap_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        faceswap_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        faceswap_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        faceswap_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        faceswap_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        faceswap_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        faceswap_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        faceswap_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        faceswap_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        faceswap_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # Real ESRGAN    
-                with gr.TabItem("Real ESRGAN 🔎", id=298) as tab_resrgan:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_resrgan"], id=298) as tab_resrgan:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Real ESRGAN</br>
-                                <b>Function : </b>Upscale x2, x4 or x8 using Real ESRGAN</br>
-                                <b>Input(s) : </b>Input image</br>
-                                <b>Output(s) : </b>Upscaled image</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_resrgan"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_resrgan_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_resrgan_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_resrgan_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_resrgan)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Upload or import an <b>Input image</b> </br>- (optional) Modify the settings to change scale factor or use another model</br>- Click the <b>Generate</b> button</br>- After generation, upscaled image is displayed in the gallery.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_resrgan_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -7263,62 +7267,62 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 outputs=[out_resrgan, gs_out_resrgan],
                                 show_progress="full",
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        resrgan_llava = gr.Button("🖼️ >> Llava (gguf)")
-                                        resrgan_img2txt_git = gr.Button("🖼️ >> Image captioning")
-                                        gr.HTML(value="... image module ...")
-                                        resrgan_img2img = gr.Button("🖼️ >> Img2img")
-                                        resrgan_img2img_ip = gr.Button("🖼️ >> IP-Adapter")
-                                        resrgan_img2var = gr.Button("🖼️ >> Image variation")
-                                        resrgan_pix2pix = gr.Button("🖼️ >> Instruct pix2pix")
-                                        resrgan_magicmix = gr.Button("🖼️ >> MagicMix")
-                                        resrgan_inpaint = gr.Button("🖼️ >> Inpaint")
-                                        resrgan_paintbyex = gr.Button("🖼️ >> Paint by example")
-                                        resrgan_outpaint = gr.Button("🖼️ >> Outpaint")
-                                        resrgan_controlnet = gr.Button("🖼️ >> ControlNet")
-                                        resrgan_faceid_ip = gr.Button("🖼️ >> Photobooth")
-                                        resrgan_faceswap = gr.Button("🖼️ >> Faceswap")
-                                        resrgan_gfpgan = gr.Button("🖼️ >> GFPGAN")
-                                        gr.HTML(value="... video module ...")
-                                        resrgan_img2vid = gr.Button("🖼️ >> Stable Video Diffusion")
-                                        gr.HTML(value="... 3d module ...")
-                                        resrgan_img2shape = gr.Button("🖼️ >> Shap-E img2shape")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        resrgan_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        resrgan_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        resrgan_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        resrgan_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        resrgan_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        resrgan_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        resrgan_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        resrgan_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        resrgan_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        resrgan_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        resrgan_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        resrgan_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        resrgan_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        resrgan_gfpgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_gfpgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        resrgan_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        resrgan_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # GFPGAN    
-                with gr.TabItem("GFPGAN 🔎", id=299) as tab_gfpgan:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_gfpgan"], id=299) as tab_gfpgan:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>GFPGAN</br>
-                                <b>Function : </b>Restore and enhance faces in an image using GFPGAN</br>
-                                <b>Input(s) : </b>Input image</br>
-                                <b>Output(s) : </b>Enhanced Image</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_gfpgan"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_gfpgan_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_gfpgan_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_gfpgan_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_gfpgan)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Upload or import an <b>Input image</b></br>- (optional) Modify the settings to use another variant of the GFPGAN model</br>- Click the <b>Generate</b> button</br>- After generation, enhanced image is displayed in the gallery
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_gfpgan_about_instruct"]}
                                 </div>
                                 """
                             )                     
@@ -7389,65 +7393,65 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=[out_gfpgan, gs_out_gfpgan],
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... text module ...")
-                                        gfpgan_llava = gr.Button("🖼️ >> Llava (gguf)")
-                                        gfpgan_img2txt_git = gr.Button("🖼️ >> Image captioning")
-                                        gr.HTML(value="... image module ...")
-                                        gfpgan_img2img = gr.Button("🖼️ >> Img2img")
-                                        gfpgan_img2img_ip = gr.Button("🖼️ >> IP-Adapter")
-                                        gfpgan_img2var = gr.Button("🖼️ >> Image variation")
-                                        gfpgan_pix2pix = gr.Button("🖼️ >> Instruct pix2pix")
-                                        gfpgan_magicmix = gr.Button("🖼️ >> MagicMix")
-                                        gfpgan_inpaint = gr.Button("🖼️ >> Inpaint")
-                                        gfpgan_paintbyex = gr.Button("🖼️ >> Paint by example")
-                                        gfpgan_outpaint = gr.Button("🖼️ >> Outpaint")
-                                        gfpgan_controlnet = gr.Button("🖼️ >> ControlNet")
-                                        gfpgan_faceid_ip = gr.Button("🖼️ >> Photobooth")
-                                        gfpgan_faceswap = gr.Button("🖼️ >> Faceswap")
-                                        gfpgan_resrgan = gr.Button("🖼️ >> Real ESRGAN")
-                                        gr.HTML(value="... video module ...")
-                                        gfpgan_img2vid = gr.Button("🖼️ >> Stable Video Diffusion")
-                                        gr.HTML(value="... 3d module ...")
-                                        gfpgan_img2shape = gr.Button("🖼️ >> Shap-E img2shape")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        gfpgan_llava = gr.Button(f'🖼️ >> {UI_STRINGS["tab_llava"]}')
+                                        gfpgan_img2txt_git = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2txt_git"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        gfpgan_img2img = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img"]}')
+                                        gfpgan_img2img_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2img_ip"]}')
+                                        gfpgan_img2var = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2var"]}')
+                                        gfpgan_pix2pix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_pix2pix"]}')
+                                        gfpgan_magicmix = gr.Button(f'🖼️ >> {UI_STRINGS["tab_magicmix"]}')
+                                        gfpgan_inpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_inpaint"]}')
+                                        gfpgan_paintbyex = gr.Button(f'🖼️ >> {UI_STRINGS["tab_paintbyex"]}')
+                                        gfpgan_outpaint = gr.Button(f'🖼️ >> {UI_STRINGS["tab_outpaint"]}')
+                                        gfpgan_controlnet = gr.Button(f'🖼️ >> {UI_STRINGS["tab_controlnet"]}')
+                                        gfpgan_faceid_ip = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceid_ip"]}')
+                                        gfpgan_faceswap = gr.Button(f'🖼️ >> {UI_STRINGS["tab_faceswap"]}')
+                                        gfpgan_resrgan = gr.Button(f'🖼️ >> {UI_STRINGS["tab_resrgan"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        gfpgan_img2vid = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2vid"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_3d_module"]} ...')
+                                        gfpgan_img2shape = gr.Button(f'🖼️ >> {UI_STRINGS["tab_img2shape"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # Audio
-        with gr.TabItem("Audio 🎵", id=3) as tab_audio:
+        with gr.TabItem(UI_STRINGS["tab_audio"], id=3) as tab_audio:
             with gr.Tabs() as tabs_audio:        
 # Musicgen
-                with gr.TabItem("MusicGen 🎶", id=31) as tab_musicgen:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_musicgen"], id=31) as tab_musicgen:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>MusicGen</br>
-                                <b>Function : </b>Generate music from a prompt, using MusicGen</br>
-                                <b>Input(s) : </b>Prompt</br>
-                                <b>Output(s) : </b>Generated music</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_musicgen"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_musicgen_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_musicgen_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_musicgen_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(modellist_musicgen)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Fill the <b>prompt</b> by describing the music you want to generate</br>- (optional) Modify the settings to use another model or change audio duration</br>- Click the <b>Generate</b> button</br>- After generation, generated music is available to listen in the <b>Generated music<b> field.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_musicgen_about_instruct"]}
                                 </div>
                                 """
                             )                           
@@ -7530,54 +7534,54 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_musicgen,
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        musicgen_musicgen_mel = gr.Button("🎶 >> MusicGen Melody")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        musicgen_musicgen_mel = gr.Button(f'🎶 >> {UI_STRINGS["tab_musicgen_mel"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        musicgen_musicgen_mel_input = gr.Button("✍️ >> MusicGen Melody")
-                                        musicgen_musicldm_input = gr.Button("✍️ >> MusicLDM")
-                                        musicgen_audiogen_input = gr.Button("✍️ >> AudioGen")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        musicgen_musicgen_mel_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen_mel"]}')
+                                        musicgen_musicldm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicldm"]}')
+                                        musicgen_audiogen_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # Musicgen Melody
                 if ram_size() >= 16 :
-                    titletab_musicgen_mel = "MusicGen Melody 🎶"
+                    titletab_musicgen_mel = f'{UI_STRINGS["tab_musicgen_mel"]} 🎶'
                 else :
-                    titletab_musicgen_mel = "MusicGen Melody ⛔"
+                    titletab_musicgen_mel = f'{UI_STRINGS["tab_musicgen_mel"]} ⛔'
 
                 with gr.TabItem(titletab_musicgen_mel, id=32) as tab_musicgen_mel:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>MusicGen Melody</br>
-                                <b>Function : </b>Generate music from a prompt with guidance from an input audio, using MusicGen</br>
-                                <b>Input(s) : </b>Input prompt, Input audio</br>
-                                <b>Output(s) : </b>Generated music</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_musicgen_mel"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_musicgen_mel_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_musicgen_mel_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_musicgen_mel_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(modellist_musicgen_mel)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Select an audio source type (file or micro recording)</br>- Select an audio source by choosing a file or recording something</br>- Fill the <b>prompt</b> by describing the music you want to generate from the audio source</br>- (optional) Modify the settings to change audio duration or inferences parameters</br>- Click the <b>Generate<b> button</br>- After generation, generated music is available to listen in the <b>Generated music<b> field.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_musicgen_mel_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -7668,49 +7672,49 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_musicgen_mel,
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        musicgen_mel_musicgen_mel = gr.Button("🎶 >> MusicGen Melody")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        musicgen_mel_musicgen_mel = gr.Button(f'🎶 >> {UI_STRINGS["tab_musicgen_mel"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        musicgen_mel_musicgen_input = gr.Button("✍️ >> MusicGen")
-                                        musicgen_mel_musicldm_input = gr.Button("✍️ >> MusicLDM")
-                                        musicgen_mel_audiogen_input = gr.Button("✍️ >> AudioGen")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        musicgen_mel_musicgen_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        musicgen_mel_musicldm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicldm"]}')
+                                        musicgen_mel_audiogen_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # MusicLDM
-                with gr.TabItem("MusicLDM 🎶", id=33) as tab_musicldm:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_musicldm"], id=33) as tab_musicldm:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>MusicLDM</br>
-                                <b>Function : </b>Generate music from a prompt and a negative prompt, using MusicLDM</br>
-                                <b>Input(s) : </b>Prompt, negative prompt</br>
-                                <b>Output(s) : </b>Generated music</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_musicldm"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_musicldm_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_musicldm_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_musicldm_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_musicldm)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Fill the <b>prompt</b> by describing the music you want to generate</br>- Fill the <b>negative prompt</b> by describing what you DO NOT want to generate</br>- (optional) Modify the settings to use another model or change audio duration</br>- Click the <b>Generate<b> button</br>- After generation, generated music is available to listen in the <b>Generated music<b> field.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_musicldm_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -7797,54 +7801,54 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_musicldm,
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        musicldm_musicgen_mel = gr.Button("🎶 >> MusicGen Melody")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        musicldm_musicgen_mel = gr.Button(f'🎶 >> {UI_STRINGS["tab_musicgen_mel"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        musicldm_musicgen_input = gr.Button("✍️ >> MusicGen")
-                                        musicldm_musicgen_mel_input = gr.Button("✍️ >> MusicGen Melody")
-                                        musicldm_audiogen_input = gr.Button("✍️ >> AudioGen")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        musicldm_musicgen_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        musicldm_musicgen_mel_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen_mel"]}')
+                                        musicldm_audiogen_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_audiogen"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # Audiogen
                 if ram_size() >= 16 :
-                    titletab_audiogen = "AudioGen 🔊"
+                    titletab_audiogen = f'{UI_STRINGS["tab_audiogen"]} 🔊'
                 else :
-                    titletab_audiogen = "AudioGen ⛔"
+                    titletab_audiogen = f'{UI_STRINGS["tab_audiogen"]} ⛔'
                 
                 with gr.TabItem(titletab_audiogen, id=34) as tab_audiogen:
 
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>AudioGen</br>
-                                <b>Function : </b>Generate sound from a prompt, using Audiogen</br>
-                                <b>Input(s) : </b>Prompt</br>
-                                <b>Output(s) : </b>Generated sound</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_audiogen"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_audiogen_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_audiogen_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_audiogen_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(modellist_audiogen)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Fill the <b>Prompt</b> by describing the sound you want to generate</br>- (optional) Modify the settings to change audio duration</br>- Click the <b>Generate</b> button</br>- After generation, generated sound is available to listen in the <b>Generated sound</b> field.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_audiogen_about_instruct"]}
                                 </div>
                                 """
                             )                       
@@ -7926,49 +7930,49 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_audiogen,
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        audiogen_musicgen_mel = gr.Button("🎶 >> MusicGen Melody")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        audiogen_musicgen_mel = gr.Button(f'🎶 >> {UI_STRINGS["tab_musicgen_mel"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        audiogen_musicgen_input = gr.Button("✍️ >> MusicGen")
-                                        audiogen_musicgen_mel_input = gr.Button("✍️ >> MusicGen Melody")
-                                        audiogen_musicldm_input = gr.Button("✍️ >> MusicLDM")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        audiogen_musicgen_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen"]}')
+                                        audiogen_musicgen_mel_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicgen_mel"]}')
+                                        audiogen_musicldm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_musicldm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # Harmonai
-                with gr.TabItem("Harmonai 🔊", id=35) as tab_harmonai:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_harmonai"], id=35) as tab_harmonai:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Harmonai</br>
-                                <b>Function : </b>Generate audio from a specific model using Harmonai</br>
-                                <b>Input(s) : </b>None</br>
-                                <b>Output(s) : </b>Generated audio</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_harmonai"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_harmonai_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_harmonai_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_harmonai_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_harmonai)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - (optional) Modify the settings to change audio duration or choose another model</br>- Click the <b>Generate<b> button</br>- After generation, generated audio is available to listen in the <b>Output<b> field.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_harmonai_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -8033,44 +8037,44 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_harmonai,
                             show_progress="full",    
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():                                
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        harmonai_musicgen_mel = gr.Button("🎶 >> MusicGen Melody")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        harmonai_musicgen_mel = gr.Button(f'🎶 >> {UI_STRINGS["tab_musicgen_mel"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # Bark
-                with gr.TabItem("Bark 🗣️", id=36) as tab_bark:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_bark"], id=36) as tab_bark:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Bark</br>
-                                <b>Function : </b>Generate high quality text-to-speech in several languages with Bark</br>
-                                <b>Input(s) : </b>Prompt</br>
-                                <b>Output(s) : </b>Generated speech</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_bark"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_bark_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_bark_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_bark_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_bark)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Fill the <b>prompt</b> with the text you want to hear</br>- (optional) Modify the settings to select a model and a voice</br>- Click the <b>Generate</b> button</br>- After generation, generated audio is available to listen in the <b>Generated speech</b> field.</br><b>Tips : </b>You can add modifications to the generated voices, by adding the following in your prompts :</br>[laughter]</br>[laughs]</br>[sighs]</br>[music]</br>[gasps]</br>[clears throat]</br>— or ... for hesitations</br>♪ for song lyrics</br>CAPITALIZATION for emphasis of a word</br>[MAN] and [WOMAN] to bias Bark toward male and female speakers, respectively</br>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_bark_about_instruct"]}
                                 </div>
                                 """
                             )
@@ -8124,55 +8128,55 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                             outputs=out_bark,
                             show_progress="full",
                         )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... audio module ...")
-                                        bark_musicgen_mel = gr.Button("🎶 >> MusicGen Melody")
-                                        gr.HTML(value="... text module ...")
-                                        bark_whisper = gr.Button("🗣️ >> Whisper")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_audio_module"]} ...')
+                                        bark_musicgen_mel = gr.Button(f'🎶 >> {UI_STRINGS["tab_musicgen_mel"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_text_module"]} ...')
+                                        bark_whisper = gr.Button(f'🗣️ >> {UI_STRINGS["tab_whisper"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # Video
-        with gr.TabItem("Video 🎬", id=4) as tab_video:
+        with gr.TabItem(UI_STRINGS["tab_video"], id=4) as tab_video:
             with gr.Tabs() as tabs_video:
 # Modelscope
                 if ram_size() >= 16 :
-                    titletab_txt2vid_ms = "Modelscope 📼"
+                    titletab_txt2vid_ms = f'{UI_STRINGS["tab_txt2vid_ms"]} 📼'
                 else :
-                    titletab_txt2vid_ms = "Modelscope ⛔"
+                    titletab_txt2vid_ms = f'{UI_STRINGS["tab_txt2vid_ms"]} ⛔'
                     
                 with gr.TabItem(titletab_txt2vid_ms, id=41) as tab_txt2vid_ms:
                         
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Modelscope</br>
-                                <b>Function : </b>Generate video from a prompt and a negative prompt using Modelscope</br>
-                                <b>Input(s) : </b>Prompt, negative prompt</br>
-                                <b>Output(s) : </b>Video</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2vid_ms"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2vid_ms_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2vid_ms_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2vid_ms_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2vid_ms)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - (optional) Modify the settings to use another model, modify the number of frames to generate, fps of the output video or change dimensions of the outputs</br>- Fill the <b>prompt</b> with what you want to see in your output video</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output video</br>- Click the <b>Generate</b> button</br>- After generation, generated video is displayed in the <b>Generated video</b> field.</br>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2vid_ms_about_instruct"]}</br>
                                 </div>
                                 """
                             )                
@@ -8322,55 +8326,55 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     btn_txt2vid_ms_gif,
                                     ]
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... video module ...")
-                                        txt2vid_ms_vid2vid_ze = gr.Button("📼 >> Video Instruct-Pix2Pix")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2vid_ms_vid2vid_ze = gr.Button(f'📼 >> {UI_STRINGS["tab_vid2vid_ze"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2vid_ms_txt2img_sd_input = gr.Button("✍️ >> Stable Diffusion")
-                                        txt2vid_ms_txt2img_kd_input = gr.Button("✍️ >> Kandinsky")
-                                        txt2vid_ms_txt2img_lcm_input = gr.Button("✍️ >> LCM")
-                                        txt2vid_ms_txt2img_mjm_input = gr.Button("✍️ >> Midjourney-mini")
-                                        txt2vid_ms_txt2img_paa_input = gr.Button("✍️ >> PixArt-Alpha")
-                                        gr.HTML(value="... video module ...")
-                                        txt2vid_ms_txt2vid_ze_input = gr.Button("✍️ >> Text2Video-Zero")
-                                        txt2vid_ms_animatediff_lcm_input = gr.Button("✍️ >> AnimateDiff")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2vid_ms_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        txt2vid_ms_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        txt2vid_ms_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        txt2vid_ms_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        txt2vid_ms_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2vid_ms_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
+                                        txt2vid_ms_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # Txt2vid_zero            
-                with gr.TabItem("Text2Video-Zero 📼", id=42) as tab_txt2vid_ze:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_txt2vid_ze"], id=42) as tab_txt2vid_ze:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Text2Video-Zero</br>
-                                <b>Function : </b>Generate video from a prompt and a negative prompt using Text2Video-Zero, Stable Diffusion Models</br>
-                                <b>Input(s) : </b>Prompt, negative prompt</br>
-                                <b>Output(s) : </b>Video</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2vid_ze"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2vid_ze_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2vid_ze_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2vid_ze_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2vid_ze)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - (optional) Modify the settings to use another model, modify the number of frames to generate, fps of the output video or change dimensions of the outputs</br>- Fill the <b>prompt</b> with what you want to see in your output video</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output video</br>- Click the <b>Generate</b> button</br>- After generation, generated video is displayed in the <b>Generated video</b> field.</br>
-                                <b>Models :</b></br>
-                                - You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2vid_ze_about_instruct"]}</br>
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_txt2vid_ze_about_models_inst1"]}
                                 </div>
                                 """
                             )                      
@@ -8570,60 +8574,60 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     btn_txt2vid_ze_gif,
                                     ]
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():                                
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... video module ...")
-                                        txt2vid_ze_vid2vid_ze = gr.Button("📼 >> Video Instruct-Pix2Pix")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2vid_ze_vid2vid_ze = gr.Button(f'📼 >> {UI_STRINGS["tab_vid2vid_ze"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        txt2vid_ze_txt2img_sd_input = gr.Button("✍️ >> Stable Diffusion")
-                                        txt2vid_ze_txt2img_kd_input = gr.Button("✍️ >> Kandinsky")
-                                        txt2vid_ze_txt2img_lcm_input = gr.Button("✍️ >> LCM")
-                                        txt2vid_ze_txt2img_mjm_input = gr.Button("✍️ >> Midjourney-mini")
-                                        txt2vid_ze_txt2img_paa_input = gr.Button("✍️ >> PixArt-Alpha")
-                                        gr.HTML(value="... video module ...")
-                                        txt2vid_ze_txt2vid_ms_input = gr.Button("✍️ >> Modelscope")
-                                        txt2vid_ze_animatediff_lcm_input = gr.Button("✍️ >> AnimateDiff")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        txt2vid_ze_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        txt2vid_ze_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        txt2vid_ze_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        txt2vid_ze_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        txt2vid_ze_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        txt2vid_ze_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        txt2vid_ze_animatediff_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_animatediff_lcm"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # animatediff
                 if ram_size() >= 16 :
-                    titletab_tab_animatediff_lcm = "AnimateDiff 📼"
+                    titletab_tab_animatediff_lcm = f'{UI_STRINGS["tab_animatediff_lcm"]} 📼'
                 else :
-                    titletab_tab_animatediff_lcm = "AnimateDiff ⛔"
+                    titletab_tab_animatediff_lcm = f'{UI_STRINGS["tab_animatediff_lcm"]} ⛔'
                 with gr.TabItem(titletab_tab_animatediff_lcm, id=43) as tab_animatediff_lcm:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>AnimateDiff</br>
-                                <b>Function : </b>Generate video from a prompt and a negative prompt using AnimateLCM / ByteDance/AnimateDiff-Lightning, Stable Diffusion Models</br>
-                                <b>Input(s) : </b>Prompt, negative prompt</br>
-                                <b>Output(s) : </b>Video</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_animatediff_lcm"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_animatediff_lcm_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_animatediff_lcm_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_animatediff_lcm_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_animatediff_lcm)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - (optional) Modify the settings to use another model, modify the number of frames to generate, fps of the output video or change dimensions of the outputs</br>- Fill the <b>prompt</b> with what you want to see in your output video</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output video</br>- Click the <b>Generate</b> button</br>- After generation, generated video is displayed in the <b>Generated video</b> field.</br>
-                                <b>Models :</b></br>
-                                - You could place huggingface.co or civitai.com Stable diffusion based safetensors models in the directory biniou/models/Stable Diffusion. Restart Biniou to see them in the models list.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_animatediff_lcm_about_instruct"]}</br>
+                                <b>{UI_STRINGS["about_models"]}</b></br>
+                                - {UI_STRINGS["tab_animatediff_lcm_about_models_inst1"]}
                                 </div>
                                 """
                             )
@@ -8823,58 +8827,58 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     btn_animatediff_lcm_gif,
                                     ]
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... video module ...")
-                                        animatediff_lcm_vid2vid_ze = gr.Button("📼 >> Video Instruct-Pix2Pix")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        animatediff_lcm_vid2vid_ze = gr.Button(f'📼 >> {UI_STRINGS["tab_vid2vid_ze"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        animatediff_lcm_txt2img_sd_input = gr.Button("✍️ >> Stable Diffusion")
-                                        animatediff_lcm_txt2img_kd_input = gr.Button("✍️ >> Kandinsky")
-                                        animatediff_lcm_txt2img_lcm_input = gr.Button("✍️ >> LCM")
-                                        animatediff_lcm_txt2img_mjm_input = gr.Button("✍️ >> Midjourney-mini")
-                                        animatediff_lcm_txt2img_paa_input = gr.Button("✍️ >> PixArt-Alpha")
-                                        gr.HTML(value="... video module ...")
-                                        animatediff_lcm_txt2vid_ms_input = gr.Button("✍️ >> Modelscope")
-                                        animatediff_lcm_txt2vid_ze_input = gr.Button("✍️ >> Text2Video-Zero")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        animatediff_lcm_txt2img_sd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_sd"]}')
+                                        animatediff_lcm_txt2img_kd_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_kd"]}')
+                                        animatediff_lcm_txt2img_lcm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_lcm"]}')
+                                        animatediff_lcm_txt2img_mjm_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_mjm"]}')
+                                        animatediff_lcm_txt2img_paa_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2img_paa"]}')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        animatediff_lcm_txt2vid_ms_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ms"]}')
+                                        animatediff_lcm_txt2vid_ze_input = gr.Button(f'✍️ >> {UI_STRINGS["tab_txt2vid_ze"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # img2vid
                 if ram_size() >= 16 :
-                    titletab_img2vid = "Stable Video Diffusion 📼"
+                    titletab_img2vid = f'{UI_STRINGS["tab_img2vid"]} 📼'
                 else :
-                    titletab_img2vid = "Stable Video Diffusion ⛔"
+                    titletab_img2vid = f'{UI_STRINGS["tab_img2vid"]} ⛔'
                 with gr.TabItem(titletab_img2vid, id=44) as tab_img2vid:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Stable Video Diffusion</br>
-                                <b>Function : </b>Generate video from an input image using Stable Video Diffusion</br>
-                                <b>Input(s) : </b>Input image</br>
-                                <b>Output(s) : </b>Video</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_img2vid"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_img2vid_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_img2vid_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_img2vid_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_img2vid)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - (optional) Modify the settings to use another model, modify the number of frames to generate, fps of the output video or change dimensions of the outputs</br>- Upload or import an input image</br>- Click the <b>Generate</b> button</br>- After generation, generated video is displayed in the <b>Generated video</b> field.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_img2vid_about_instruct"]}
                                 </br>
                                 """
                             )
@@ -9057,51 +9061,51 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     btn_img2vid_gif,
                                     ]
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
-                                        gr.HTML(value="... video module ...")
-                                        img2vid_vid2vid_ze = gr.Button("📼 >> Video Instruct-Pix2Pix")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_video_module"]} ...')
+                                        img2vid_vid2vid_ze = gr.Button(f'📼 >> {UI_STRINGS["tab_vid2vid_ze"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 
 # vid2vid_ze    
                 if ram_size() >= 16 :
-                    titletab_vid2vid_ze = "Video Instruct-Pix2Pix 🖌️"
+                    titletab_vid2vid_ze = f'{UI_STRINGS["tab_vid2vid_ze"]} 🖌️'
                 else :
-                    titletab_vid2vid_ze = "Video Instruct-Pix2Pix ⛔"
+                    titletab_vid2vid_ze = f'{UI_STRINGS["tab_vid2vid_ze"]} ⛔'
 
                 with gr.TabItem(titletab_vid2vid_ze, id=45) as tab_vid2vid_ze:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Video Instruct-Pix2Pix</br>
-                                <b>Function : </b>Edit an input video with instructions from a prompt and a negative prompt using Instructpix2pix, Text2Video-Zero</br>
-                                <b>Input(s) : </b>Input video, prompt, negative prompt</br>
-                                <b>Output(s) : </b>Video</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_vid2vid_ze"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_vid2vid_ze_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_vid2vid_ze_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_vid2vid_ze_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_vid2vid_ze)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Upload or import a video using the <b>Input video</b> field</br>- Fill the <b>prompt</b> with the instructions for modifying your input video</br>- Fill the <b>negative prompt</b> with what you DO NOT want to see in your output video</br>- (optional) Modify the settings to change the number of frames to process (default=8) or the fps of the output</br>- Click the <b>Generate</b> button</br>- After generation, generated video is displayed in the Generated video field.</br></br>
-                                <b>Examples : </b><a href='https://www.timothybrooks.com/instruct-pix2pix/' target='_blank'>Instructpix2pix : Learning to Follow Image Editing Instructions</a>
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_vid2vid_ze_about_instruct"]}</br></br>
+                                <b>{UI_STRINGS["about_examples"]}</b><a href='https://www.timothybrooks.com/instruct-pix2pix/' target='_blank'>{UI_STRINGS["tab_vid2vid_ze_about_examples_text"]}</a>
                                 </div>
                                 """
                             )                
@@ -9274,47 +9278,47 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     btn_vid2vid_ze_gif,
                                     ]
                             )
-                    with gr.Accordion("Send ...", open=False):
+                    with gr.Accordion(UI_STRINGS["send_to"], open=False):
                         with gr.Row():
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... selected output to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_selected_output"]} ...')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... input prompt(s) to ...")
-                                        gr.HTML(value="... image module ...")
-                                        vid2vid_ze_pix2pix = gr.Button("✍️ >> Instruct pix2pix")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_input_prompts"]} ...')
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_image_module"]} ...')
+                                        vid2vid_ze_pix2pix = gr.Button(f'✍️ >> {UI_STRINGS["tab_pix2pix"]}')
                             with gr.Column():
                                 with gr.Box():
                                     with gr.Group():
-                                        gr.HTML(value="... both to ...")
+                                        gr.HTML(value=f'... {UI_STRINGS["send_to_both"]} ...')
 # 3d
-        with gr.TabItem("3d 🧊", id=5) as tab_3d:
+        with gr.TabItem(UI_STRINGS["tab_3d"], id=5) as tab_3d:
             with gr.Tabs() as tabs_3d:
 # txt2shape
-                with gr.TabItem("Shap-E txt2shape 🧊", id=51) as tab_txt2shape:
-                    with gr.Accordion("About", open=False):
+                with gr.TabItem(UI_STRINGS["tab_txt2shape"], id=51) as tab_txt2shape:
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():                       
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Shap-E txt2shape</br>
-                                <b>Function : </b>Generate 3d animated gif or 3d mesh object from a prompt using Shap-E</br>
-                                <b>Input(s) : </b>Prompt</br>
-                                <b>Output(s) : </b>Animated gif or mesh object</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_txt2shape"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_txt2shape_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_txt2shape_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_txt2shape_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_txt2shape)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Fill the <b>prompt</b> with what you want to see in your output</br>- Select the desired output type : animated Gif or 3D Model (mesh)</br>- (optional) Modify the settings to generate several images in a single run or change dimensions of the outputs</br>- Click the <b>Generate</b> button</br>- After generation, generated images or 3D models are displayed in the output field. Save them individually or create a downloadable zip of the whole gallery.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_txt2shape_about_instruct"]}
                                 </br>
                                 """
                             ) 
@@ -9490,26 +9494,26 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                     titletab_img2shape = "Shap-E img2shape ⛔"
 # img2shape
                 with gr.TabItem(titletab_img2shape, id=52) as tab_img2shape:
-                    with gr.Accordion("About", open=False):
+                    with gr.Accordion(UI_STRINGS["about"], open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Informations</h1>
-                                <b>Module : </b>Shap-E img2shape</br>
-                                <b>Function : </b>Generate 3d animated gif or 3d mesh object from an imput image using Shap-E</br>
-                                <b>Input(s) : </b>Input image</br>
-                                <b>Output(s) : </b>Animated gif or mesh object</br>
-                                <b>HF model page : </b>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
+                                <b>{UI_STRINGS["about_module"]}</b>{UI_STRINGS["tab_img2shape"]}</br>
+                                <b>{UI_STRINGS["about_function"]}</b>{UI_STRINGS["tab_img2shape_about_desc"]}</br>
+                                <b>{UI_STRINGS["about_inputs"]}</b>{UI_STRINGS["tab_img2shape_about_input_text"]}</br>
+                                <b>{UI_STRINGS["about_outputs"]}</b>{UI_STRINGS["tab_img2shape_about_output_text"]}</br>
+                                <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(model_list_img2shape)}<br />
                                 """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
-                                <h1 style='text-align: left;'>Help</h1>
+                                f"""
+                                <h1 style='text-align: left;'>{UI_STRINGS["about_help"]}</h1>
                                 <div style='text-align: justified'>
-                                <b>Usage :</b></br>
-                                - Upload or import an image using the <b>Input image</b> field. To achieve good results, objects to create should be on a white backgrounds</br>- Select the desired output type : animated Gif or 3D Model (mesh)</br>- (optional) Modify the settings to generate several images in a single run or change dimensions of the outputs</br>- Click the <b>Generate</b> button</br>- After generation, generated images or 3D models are displayed in the output field. Save them individually or create a downloadable zip of the whole gallery.
+                                <b>{UI_STRINGS["about_usage"]}</b></br>
+                                {UI_STRINGS["tab_img2shape_about_instruct"]}
                                 </br>
                                 """
                             )
@@ -9679,47 +9683,47 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     with gr.Group():
                                         gr.HTML(value="... both to ...")
 # Global settings
-        with gr.TabItem("Global Settings ⚙️", id=6) as tab_settings:
+        with gr.TabItem(UI_STRINGS["tab_settings"], id=6) as tab_settings:
             with gr.Tabs() as tabs_settings:
 # UI settings
-                with gr.TabItem("WebUI control 🧠", id=61) as tab_webui:
-                    with gr.Accordion("WebUI control", open=True, visible=True) as acc_webui:
+                with gr.TabItem(UI_STRINGS["tab_webui"], id=61) as tab_webui:
+                    with gr.Accordion(UI_STRINGS["tab_webui_acc"], open=True, visible=True) as acc_webui:
                         with gr.Row():
-                             with gr.Accordion("System", open=True):
+                             with gr.Accordion(UI_STRINGS["tab_webui_acc_sys"], open=True):
                                  with gr.Row():
                                      with gr.Column():
-                                         btn_restart_ui_settings = gr.Button("Restart biniou ↩️")
+                                         btn_restart_ui_settings = gr.Button(UI_STRINGS["tab_webui_btn_restart"])
                                          btn_restart_ui_settings.click(fn=biniouUIControl.restart_program)
                                      with gr.Column():
-                                         btn_reload_ui_settings = gr.Button("Reload WebUI ♻️")
+                                         btn_reload_ui_settings = gr.Button(UI_STRINGS["tab_webui_btn_reload"])
 #                                         btn_reload_ui_settings.click(fn=biniouUIControl.reload_ui, _js="window.location.reload()")
                                          btn_reload_ui_settings.click(fn=biniouUIControl.reload_ui, _js="location.replace(location.href)")
                                      with gr.Column():
-                                         btn_close_ui_settings = gr.Button("Shutdown biniou 🛑")
+                                         btn_close_ui_settings = gr.Button(UI_STRINGS["tab_webui_btn_close"])
                                          btn_close_ui_settings.click(fn=biniouUIControl.close_program)
                                      with gr.Column():
                                          gr.Number(visible=False)
                         with gr.Row():
-                             with gr.Accordion("Updates and optimizations", open=True):
+                             with gr.Accordion(UI_STRINGS["tab_webui_acc_upd"], open=True):
                                  with gr.Row():
                                      with gr.Column():
-                                         optimizer_update_ui = gr.Radio(choices=["cpu", "rocm"], value="rocm", label="Optimization type", info="Choose CPU (default) or a GPU optimization to use and click Update. You have to restart biniou and reload UI after update.")
+                                         optimizer_update_ui = gr.Radio(choices=["cpu", "rocm"], value="rocm", label=UI_STRINGS["tab_webui_radio_optim"], info=UI_STRINGS["tab_webui_radio_optim_info"])
                                  with gr.Row():
                                      with gr.Column():
-                                         btn_update_ui = gr.Button("Update biniou ⤵️", variant="primary")
+                                         btn_update_ui = gr.Button(UI_STRINGS["tab_webui_btn_update"], variant="primary")
                                          btn_update_ui.click(fn=biniouUIControl.biniou_update, inputs=optimizer_update_ui, outputs=optimizer_update_ui)
                                      with gr.Column():
                                          gr.Number(visible=False)
                                      with gr.Column():
                                          gr.Number(visible=False)
                         with gr.Row():
-                            with gr.Accordion("Llama-cpp-python backend", open=True):
+                            with gr.Accordion(UI_STRINGS["tab_webui_acc_llama"], open=True):
                                 with gr.Row():
                                     with gr.Column():
-                                        llama_backend_ui = gr.Radio(choices=["none", "rocm/hipblas", "vulkan"], value="rocm/hipblas", label="Llama-cpp-python backend", info="Choose for which backend llama-cpp-python should be compiled. Backend must be already available and working. (default = none)")
+                                        llama_backend_ui = gr.Radio(choices=["none", "rocm/hipblas", "vulkan"], value="rocm/hipblas", label=UI_STRINGS["tab_webui_radio_llama"], info=UI_STRINGS["tab_webui_radio_llama_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_llama_backend_ui = gr.Button("Update llama-cpp-python backend ⤵️", variant="primary")
+                                        btn_llama_backend_ui = gr.Button(UI_STRINGS["tab_webui_btn_llama"], variant="primary")
                                         btn_llama_backend_ui.click(fn=biniouUIControl.biniou_llama_backend, inputs=llama_backend_ui, outputs=llama_backend_ui)
                                     with gr.Column():
                                         gr.Number(visible=False)
@@ -9728,72 +9732,72 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                     with gr.Column():
                                         gr.Number(visible=False)
                         with gr.Row():
-                            with gr.Accordion("Common settings", open=True):
-                                with gr.Accordion("Backend settings", open=True):
+                            with gr.Accordion(UI_STRINGS["tab_common_settings_acc"], open=True):
+                                with gr.Accordion(UI_STRINGS["tab_common_settings_acc_backend"], open=True):
                                     with gr.Row():
                                         with gr.Column():
                                             biniou_global_settings_server_port = gr.Slider(0, 65535, step=1, precision=0, value=biniou_global_server_port, label="Server port", info="Define server port (default = 7860)")
                                         with gr.Column():
                                             biniou_global_settings_inbrowser = gr.Checkbox(value=biniou_global_inbrowser, label="Load in browser at start", info="Open webui in browser when starting biniou (default = False)", interactive=True)
-                                with gr.Accordion("Images settings", open=True):
+                                with gr.Accordion(UI_STRINGS["tab_common_settings_acc_imgs"], open=True):
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_steps_max = gr.Slider(0, 512, step=1, value=biniou_global_steps_max, label="Maximum steps", info="Maximum number of possible iterations in a generation (default=100)", interactive=True)
+                                            biniou_global_settings_steps_max = gr.Slider(0, 512, step=1, value=biniou_global_steps_max, label=UI_STRINGS["tab_common_settings_slider_steps"], info=UI_STRINGS["tab_common_settings_slider_steps_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_batch_size_max = gr.Slider(1, 512, step=1, value=biniou_global_batch_size_max, label="Maximum batch size", info="Maximum value for a batch size (default=4)", interactive=True)
+                                            biniou_global_settings_batch_size_max = gr.Slider(1, 512, step=1, value=biniou_global_batch_size_max, label=UI_STRINGS["tab_common_settings_slider_batch"], info=UI_STRINGS["tab_common_settings_slider_batch_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_width_max_img_create = gr.Slider(128, 16384, step=64, value=biniou_global_width_max_img_create, label="Maximum image width (create)", info="Maximum width of outputs when using modules that create contents (default = 4096)", interactive=True)
+                                            biniou_global_settings_width_max_img_create = gr.Slider(128, 16384, step=64, value=biniou_global_width_max_img_create, label=UI_STRINGS["tab_common_settings_slider_width_create"], info=UI_STRINGS["tab_common_settings_slider_width_create_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_height_max_img_create = gr.Slider(128, 16384, step=64, value=biniou_global_height_max_img_create, label="Maximum image height (create)", info="Maximum height of outputs when using modules that create contents (default = 4096)", interactive=True)
+                                            biniou_global_settings_height_max_img_create = gr.Slider(128, 16384, step=64, value=biniou_global_height_max_img_create, label=UI_STRINGS["tab_common_settings_slider_height_create"], info=UI_STRINGS["tab_common_settings_slider_height_create_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_width_max_img_modify = gr.Slider(128, 16384, step=64, value=biniou_global_width_max_img_modify, label="Maximum image width (modify)", info="Maximum width of outputs when using modules that modify contents (default = 8192)", interactive=True)
+                                            biniou_global_settings_width_max_img_modify = gr.Slider(128, 16384, step=64, value=biniou_global_width_max_img_modify, label=UI_STRINGS["tab_common_settings_slider_width_modify"], info=UI_STRINGS["tab_common_settings_slider_width_modify_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_height_max_img_modify = gr.Slider(128, 16384, step=64, value=biniou_global_height_max_img_modify, label="Maximum image height (modify)", info="Maximum height of outputs when using modules that modify contents (default = 8192)", interactive=True)
+                                            biniou_global_settings_height_max_img_modify = gr.Slider(128, 16384, step=64, value=biniou_global_height_max_img_modify, label=UI_STRINGS["tab_common_settings_slider_height_modify"], info=UI_STRINGS["tab_common_settings_slider_height_modify_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_sd15_width = gr.Slider(128, 16384, step=64, value=biniou_global_sd15_width, label="Default image width (SD 1.5 models)", info="Width of outputs when using SD 1.5 models (default = 512)", interactive=True)
+                                            biniou_global_settings_sd15_width = gr.Slider(128, 16384, step=64, value=biniou_global_sd15_width, label=UI_STRINGS["tab_common_settings_slider_sd15_width"], info=UI_STRINGS["tab_common_settings_slider_sd15_width_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_sd15_height = gr.Slider(128, 16384, step=64, value=biniou_global_sd15_height, label="Default image height (SD 1.5 models)", info="Height of outputs when using SD 1.5 models (default = 512)", interactive=True)
+                                            biniou_global_settings_sd15_height = gr.Slider(128, 16384, step=64, value=biniou_global_sd15_height, label=UI_STRINGS["tab_common_settings_slider_sd15_height"], info=UI_STRINGS["tab_common_settings_slider_sd15_height_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_sdxl_width = gr.Slider(128, 16384, step=64, value=biniou_global_sdxl_width, label="Default image width (SDXL models)", info="Width of outputs when using SDXL models (default = 1024)", interactive=True)
+                                            biniou_global_settings_sdxl_width = gr.Slider(128, 16384, step=64, value=biniou_global_sdxl_width, label=UI_STRINGS["tab_common_settings_slider_sdxl_width"], info=UI_STRINGS["tab_common_settings_slider_sdxl_width_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_sdxl_height = gr.Slider(128, 16384, step=64, value=biniou_global_sdxl_height, label="Default image height (SDXL models)", info="Height of outputs when using SDXL models (default = 1024)", interactive=True)
+                                            biniou_global_settings_sdxl_height = gr.Slider(128, 16384, step=64, value=biniou_global_sdxl_height, label=UI_STRINGS["tab_common_settings_slider_sdxl_height"], info=UI_STRINGS["tab_common_settings_slider_sdxl_height_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_gfpgan = gr.Checkbox(value=biniou_global_gfpgan, label="Default use of GFPGAN to restore faces", info="Activate/desactivate gfpgan enhancement for all modules using it (default = True)", interactive=True)
+                                            biniou_global_settings_gfpgan = gr.Checkbox(value=biniou_global_gfpgan, label=UI_STRINGS["tab_common_settings_check_gfpgan"], info=UI_STRINGS["tab_common_settings_check_gfpgan_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_tkme = gr.Slider(0.0, 1.0, step=0.01, value=biniou_global_tkme, label="Default token merging ratio", info="Set token merging ratio for all modules using it (default = 0.6)", interactive=True)
+                                            biniou_global_settings_tkme = gr.Slider(0.0, 1.0, step=0.01, value=biniou_global_tkme, label=UI_STRINGS["tab_common_settings_slider_tkme"], info=UI_STRINGS["tab_common_settings_slider_tkme_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_clipskip = gr.Slider(0, 12, step=1, value=biniou_global_clipskip, label="Default CLIP skip value", info="Numbers of CLIP layers to skip for all modules using it. SD 1.5 only. (default = 0)", interactive=True)
+                                            biniou_global_settings_clipskip = gr.Slider(0, 12, step=1, value=biniou_global_clipskip, label=UI_STRINGS["tab_common_settings_slider_clipskip"], info=UI_STRINGS["tab_common_settings_slider_clipskip_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_ays = gr.Checkbox(value=biniou_global_ays, label="Default use of AYS scheduler optimization", info="Activate/desactivate AYS enhancement for all modules using it (default = False)", interactive=True)
+                                            biniou_global_settings_ays = gr.Checkbox(value=biniou_global_ays, label=UI_STRINGS["tab_common_settings_check_ays"], info=UI_STRINGS["tab_common_settings_check_ays_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_img_fmt = gr.Dropdown(choices=img_fmt_list(), value=biniou_global_img_fmt, label="Default format for output images", info="Select a default image format for outputs (default = png)", interactive=True)
+                                            biniou_global_settings_img_fmt = gr.Dropdown(choices=img_fmt_list(), value=biniou_global_img_fmt, label=UI_STRINGS["tab_common_settings_drop_img_fmt"], info=UI_STRINGS["tab_common_settings_drop_img_fmt_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_text_metadatas = gr.Checkbox(value=biniou_global_text_metadatas, label="Add metadatas to text", info="Add generation settings to texts outputs (default = True)", interactive=True)
+                                            biniou_global_settings_text_metadatas = gr.Checkbox(value=biniou_global_text_metadatas, label=UI_STRINGS["tab_common_settings_check_txt_meta"], info=UI_STRINGS["tab_common_settings_check_txt_meta_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_img_exif = gr.Checkbox(value=biniou_global_img_exif, label="Add Exif metadatas to jpg and png", info="Add generation settings to images metadatas (default = True)", interactive=True)
+                                            biniou_global_settings_img_exif = gr.Checkbox(value=biniou_global_img_exif, label=UI_STRINGS["tab_common_settings_check_img_exif"], info=UI_STRINGS["tab_common_settings_check_img_exif_info"], interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_gif_exif = gr.Checkbox(value=biniou_global_gif_exif, label="Add metadatas to gi", info="Add generation settings to animated gif metadatas (default = True)", interactive=True)
+                                            biniou_global_settings_gif_exif = gr.Checkbox(value=biniou_global_gif_exif, label=UI_STRINGS["tab_common_settings_check_gif_exif"], info=UI_STRINGS["tab_common_settings_check_gif_exif_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_mp4_metadatas = gr.Checkbox(value=biniou_global_mp4_metadatas, label="Add metadatas to mp4", info="Add generation settings to mp4 metadatas (default = True)", interactive=True)
+                                            biniou_global_settings_mp4_metadatas = gr.Checkbox(value=biniou_global_mp4_metadatas, label=UI_STRINGS["tab_common_settings_check_mp4_meta"], info=UI_STRINGS["tab_common_settings_check_mp4_meta_info"], interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_audio_metadatas = gr.Checkbox(value=biniou_global_audio_metadatas, label="Add metadatas to wav", info="Add generation settings to wav metadatas (default = True)", interactive=True)
-                                with gr.Accordion("Custom File Naming", open=True):
+                                            biniou_global_settings_audio_metadatas = gr.Checkbox(value=biniou_global_audio_metadatas, label=UI_STRINGS["tab_common_settings_check_audio_meta"], info=UI_STRINGS["tab_common_settings_check_audio_meta_info"], interactive=True)
+                                with gr.Accordion(UI_STRINGS["tab_common_settings_acc_custom_fn"], open=True):
                                     with gr.Row():
                                         with gr.Column():
                                             biniou_global_settings_custom_fn = gr.Checkbox(value=False, label="Enable custom file naming", info="Enable custom file naming scheme for generated images.", interactive=True)
                                         with gr.Column():
-                                            biniou_global_settings_fn_scheme = gr.Textbox(value="{model}_{seed}_{date}", label="File naming scheme", info="Define the naming scheme. Placeholders: {prompt}, {model}, {seed}, {date}, {time}", interactive=True)
+                                            biniou_global_settings_fn_scheme = gr.Textbox(value="{model}_{seed}_{date}", label=UI_STRINGS["tab_common_settings_text_fn_scheme"], info=UI_STRINGS["tab_common_settings_text_fn_scheme_info"], interactive=True)
                                 with gr.Row():
                                     with gr.Column():
-                                        save_ini_btn_settings = gr.Button("Save custom defaults settings 💾")
+                                        save_ini_btn_settings = gr.Button(UI_STRINGS["tab_common_settings_btn_save"])
                                     with gr.Column():
                                         module_name_settings = gr.Textbox(value="settings", visible=False, interactive=False)
                                         save_ini_btn_settings.click(fn=write_settings_ini,
@@ -9827,134 +9831,134 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                         )
                                         save_ini_btn_settings.click(fn=lambda: gr.Info("Common settings saved"))
 # Model Management
-                with gr.TabItem("Model Management", id=62) as tab_model_management:
-                    with gr.Accordion("Model Downloader", open=True):
+                with gr.TabItem(UI_STRINGS["tab_model_management"], id=62) as tab_model_management:
+                    with gr.Accordion(UI_STRINGS["tab_model_management_downloader_acc"], open=True):
                         with gr.Row():
-                            model_url = gr.Textbox(label="Model URL", placeholder="Paste URL of the model to download (.safetensors, .gguf)", lines=1, max_lines=1)
+                            model_url = gr.Textbox(label=UI_STRINGS["tab_model_management_downloader_text_url"], placeholder=UI_STRINGS["tab_model_management_downloader_text_placeholder"], lines=1, max_lines=1)
                         with gr.Row():
-                            model_type = gr.Dropdown(choices=['Stable Diffusion', 'LoRA (SD)', 'LoRA (SDXL)', 'Textual Inversion (SD)', 'Textual Inversion (SDXL)', 'GGUF'], label="Model Type", info="Select the type of model to determine the save location.")
-                            download_model_button = gr.Button("Download Model 💾", variant="primary")
+                            model_type = gr.Dropdown(choices=['Stable Diffusion', 'LoRA (SD)', 'LoRA (SDXL)', 'Textual Inversion (SD)', 'Textual Inversion (SDXL)', 'GGUF'], label=UI_STRINGS["tab_model_management_downloader_drop_type"], info=UI_STRINGS["tab_model_management_downloader_drop_type_info"])
+                            download_model_button = gr.Button(UI_STRINGS["tab_model_management_downloader_btn_download"], variant="primary")
                             download_model_button.click(fn=unified_model_downloader, inputs=[model_url, model_type], show_progress="full")
-                    with gr.Accordion("Models Cleaner", open=True):
+                    with gr.Accordion(UI_STRINGS["tab_model_management_cleaner_acc"], open=True):
                         with gr.Row():
-                            list_models_cleaner = gr.CheckboxGroup(choices=biniouModelsManager("./models").modelslister(), type="value", label="Installed models list", info="Select the models you want to delete and click \"Delete selected models\" button. Restart biniou to re-synchronize models list.")
+                            list_models_cleaner = gr.CheckboxGroup(choices=biniouModelsManager("./models").modelslister(), type="value", label=UI_STRINGS["tab_model_management_cleaner_check_list"], info=UI_STRINGS["tab_model_management_cleaner_check_list_info"])
                         with gr.Row():
                             with gr.Column():
-                                btn_models_cleaner = gr.Button("Delete selected models 🧹", variant="primary")
+                                btn_models_cleaner = gr.Button(UI_STRINGS["tab_model_management_cleaner_btn_delete"], variant="primary")
                                 btn_models_cleaner.click(fn=biniouModelsManager("./models").modelsdeleter, inputs=[list_models_cleaner])
                                 btn_models_cleaner.click(fn=refresh_models_cleaner_list, outputs=list_models_cleaner)
                             with gr.Column():
-                                btn_models_cleaner_refresh = gr.Button("Refresh models list ♻️")
+                                btn_models_cleaner_refresh = gr.Button(UI_STRINGS["tab_model_management_cleaner_btn_refresh"])
                                 btn_models_cleaner_refresh.click(fn=refresh_models_cleaner_list, outputs=list_models_cleaner)
                             with gr.Column():
                                 gr.Number(visible=False)
                             with gr.Column():
                                 gr.Number(visible=False)
 # LoRA Models manager
-                with gr.TabItem("LoRA models manager 🛠️", id=63, visible=False) as tab_lora_models_manager:
-                    with gr.Accordion("LoRA models manager", open=True, visible=True) as acc_lora_models_manager:
+                with gr.TabItem(UI_STRINGS["tab_lora_manager"], id=63, visible=False) as tab_lora_models_manager:
+                    with gr.Accordion(UI_STRINGS["tab_lora_manager_acc"], open=True, visible=True) as acc_lora_models_manager:
                         with gr.Row():
                             with gr.Column():
-                                gr.HTML("""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>SD models</span>""")
+                                gr.HTML(f"""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>{UI_STRINGS["tab_lora_manager_title_sd"]}</span>""")
                                 with gr.Row():
-                                    list_lora_models_manager_sd = gr.CheckboxGroup(choices=biniouLoraModelsManager("./models/lora/SD").modelslister(), type="value", label="Installed models list", info="Select the LoRA models you want to delete and click \"Delete selected models\" button. Restart biniou to re-synchronize LoRA models list.")
+                                    list_lora_models_manager_sd = gr.CheckboxGroup(choices=biniouLoraModelsManager("./models/lora/SD").modelslister(), type="value", label=UI_STRINGS["tab_lora_manager_check_list"], info=UI_STRINGS["tab_lora_manager_check_list_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_lora_models_manager_sd = gr.Button("Delete selected models 🧹", variant="primary")
+                                        btn_lora_models_manager_sd = gr.Button(UI_STRINGS["tab_lora_manager_btn_delete"], variant="primary")
                                         btn_lora_models_manager_sd.click(fn=biniouLoraModelsManager("./models/lora/SD").modelsdeleter, inputs=[list_lora_models_manager_sd])
                                         btn_lora_models_manager_sd.click(fn=refresh_lora_models_manager_list_sd, outputs=list_lora_models_manager_sd)
                                     with gr.Column():
-                                        btn_lora_models_manager_refresh_sd = gr.Button("Refresh models list ♻️")
+                                        btn_lora_models_manager_refresh_sd = gr.Button(UI_STRINGS["tab_lora_manager_btn_refresh"])
                                         btn_lora_models_manager_refresh_sd.click(fn=refresh_lora_models_manager_list_sd, outputs=list_lora_models_manager_sd)
                                 with gr.Row():
                                     with gr.Column():
-                                        url_lora_models_manager_sd = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label="LoRA model URL", info="Paste here the url of the LoRA model you want to download. Restart biniou to re-synchronize LoRA models list. Safetensors files only.")
+                                        url_lora_models_manager_sd = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label=UI_STRINGS["tab_lora_manager_text_url"], info=UI_STRINGS["tab_lora_manager_text_url_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_url_lora_models_manager_sd = gr.Button("Download LoRA model 💾", variant="primary")
+                                        btn_url_lora_models_manager_sd = gr.Button(UI_STRINGS["tab_lora_manager_btn_download"], variant="primary")
                                         btn_url_lora_models_manager_sd.click(biniouLoraModelsManager("./models/lora/SD").modelsdownloader, inputs=url_lora_models_manager_sd, outputs=url_lora_models_manager_sd)
                                     with gr.Column():
                                             gr.Number(visible=False)
                             with gr.Column():
-                                gr.HTML("""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>SDXL models</span>""")
+                                gr.HTML(f"""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>{UI_STRINGS["tab_lora_manager_title_sdxl"]}</span>""")
                                 with gr.Row():
-                                    list_lora_models_manager_sdxl = gr.CheckboxGroup(choices=biniouLoraModelsManager("./models/lora/SDXL").modelslister(), type="value", label="Installed models list", info="Select the LoRA models you want to delete and click \"Delete selected models\" button. Restart biniou to re-synchronize LoRA models list.")
+                                    list_lora_models_manager_sdxl = gr.CheckboxGroup(choices=biniouLoraModelsManager("./models/lora/SDXL").modelslister(), type="value", label=UI_STRINGS["tab_lora_manager_check_list"], info=UI_STRINGS["tab_lora_manager_check_list_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_lora_models_manager_sdxl = gr.Button("Delete selected models 🧹", variant="primary")
+                                        btn_lora_models_manager_sdxl = gr.Button(UI_STRINGS["tab_lora_manager_btn_delete"], variant="primary")
                                         btn_lora_models_manager_sdxl.click(fn=biniouLoraModelsManager("./models/lora/SDXL").modelsdeleter, inputs=[list_lora_models_manager_sdxl])
                                         btn_lora_models_manager_sdxl.click(fn=refresh_lora_models_manager_list_sdxl, outputs=list_lora_models_manager_sdxl)
                                     with gr.Column():
-                                        btn_lora_models_manager_refresh_sdxl = gr.Button("Refresh models list ♻️")
+                                        btn_lora_models_manager_refresh_sdxl = gr.Button(UI_STRINGS["tab_lora_manager_btn_refresh"])
                                         btn_lora_models_manager_refresh_sdxl.click(fn=refresh_lora_models_manager_list_sdxl, outputs=list_lora_models_manager_sdxl)
                                 with gr.Row():
                                     with gr.Column():
-                                        url_lora_models_manager_sdxl = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label="LoRA model URL", info="Paste here the url of the LoRA model you want to download. Restart biniou to re-synchronize LoRA models list. Safetensors files only.")
+                                        url_lora_models_manager_sdxl = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label=UI_STRINGS["tab_lora_manager_text_url"], info=UI_STRINGS["tab_lora_manager_text_url_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_url_lora_models_manager_sdxl = gr.Button("Download LoRA model 💾", variant="primary")
+                                        btn_url_lora_models_manager_sdxl = gr.Button(UI_STRINGS["tab_lora_manager_btn_download"], variant="primary")
                                         btn_url_lora_models_manager_sdxl.click(biniouLoraModelsManager("./models/lora/SDXL").modelsdownloader, inputs=url_lora_models_manager_sdxl, outputs=url_lora_models_manager_sdxl)
                                     with gr.Column():
                                         gr.Number(visible=False)
 
 # Textual inversion Models manager
-                with gr.TabItem("Textual inversion manager 🛠️", id=64, visible=False) as tab_textinv_manager:
-                    with gr.Accordion("Textual inversion manager", open=True, visible=True) as acc_textinv_manager:
+                with gr.TabItem(UI_STRINGS["tab_textinv_manager"], id=64, visible=False) as tab_textinv_manager:
+                    with gr.Accordion(UI_STRINGS["tab_textinv_manager_acc"], open=True, visible=True) as acc_textinv_manager:
                         with gr.Row():
                             with gr.Column():
-                                gr.HTML("""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>SD textual inversion</span>""")
+                                gr.HTML(f"""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>{UI_STRINGS["tab_textinv_manager_title_sd"]}</span>""")
                                 with gr.Row():
-                                    list_textinv_manager_sd = gr.CheckboxGroup(choices=biniouTextinvModelsManager("./models/TextualInversion/SD").modelslister(), type="value", label="Installed textual inversion list", info="Select the textual inversion you want to delete and click \"Delete selected textual inversion\" button. Restart biniou to re-synchronize textual inversion list.")
+                                    list_textinv_manager_sd = gr.CheckboxGroup(choices=biniouTextinvModelsManager("./models/TextualInversion/SD").modelslister(), type="value", label=UI_STRINGS["tab_textinv_manager_check_list"], info=UI_STRINGS["tab_textinv_manager_check_list_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_textinv_manager_sd = gr.Button("Delete selected textual inversion 🧹", variant="primary")
+                                        btn_textinv_manager_sd = gr.Button(UI_STRINGS["tab_textinv_manager_btn_delete"], variant="primary")
                                         btn_textinv_manager_sd.click(fn=biniouTextinvModelsManager("./models/TextualInversion/SD").modelsdeleter, inputs=[list_textinv_manager_sd])
                                         btn_textinv_manager_sd.click(fn=refresh_textinv_manager_list_sd, outputs=list_textinv_manager_sd)
                                     with gr.Column():
-                                        btn_textinv_manager_refresh_sd = gr.Button("Refresh textual inversion list ♻️")
+                                        btn_textinv_manager_refresh_sd = gr.Button(UI_STRINGS["tab_textinv_manager_btn_refresh"])
                                         btn_textinv_manager_refresh_sd.click(fn=refresh_textinv_manager_list_sd, outputs=list_textinv_manager_sd)
                                 with gr.Row():
                                     with gr.Column():
-                                        url_textinv_manager_sd = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label="Textual inversion URL", info="Paste here the url of the textual inversion you want to download. Restart biniou to re-synchronize textual inversion list. Safetensors files only.")
+                                        url_textinv_manager_sd = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label=UI_STRINGS["tab_textinv_manager_text_url"], info=UI_STRINGS["tab_textinv_manager_text_url_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_url_textinv_manager_sd = gr.Button("Download textual inversion 💾", variant="primary")
+                                        btn_url_textinv_manager_sd = gr.Button(UI_STRINGS["tab_textinv_manager_btn_download"], variant="primary")
                                         btn_url_textinv_manager_sd.click(biniouTextinvModelsManager("./models/TextualInversion/SD").modelsdownloader, inputs=url_textinv_manager_sd, outputs=url_textinv_manager_sd)
                                     with gr.Column():
                                             gr.Number(visible=False)
                             with gr.Column():
-                                gr.HTML("""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>SDXL textual inversion</span>""")
+                                gr.HTML(f"""<span style='text-align: left; font-size: 24px; font-weight: bold; line-height:24px;'>{UI_STRINGS["tab_textinv_manager_title_sdxl"]}</span>""")
                                 with gr.Row():
-                                    list_textinv_manager_sdxl = gr.CheckboxGroup(choices=biniouTextinvModelsManager("./models/TextualInversion/SDXL").modelslister(), type="value", label="Installed textual inversion list", info="Select the textual inversion you want to delete and click \"Delete selected textual inversion\" button. Restart biniou to re-synchronize textual inversion list.")
+                                    list_textinv_manager_sdxl = gr.CheckboxGroup(choices=biniouTextinvModelsManager("./models/TextualInversion/SDXL").modelslister(), type="value", label=UI_STRINGS["tab_textinv_manager_check_list"], info=UI_STRINGS["tab_textinv_manager_check_list_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_textinv_manager_sdxl = gr.Button("Delete selected textual inversion 🧹", variant="primary")
+                                        btn_textinv_manager_sdxl = gr.Button(UI_STRINGS["tab_textinv_manager_btn_delete"], variant="primary")
                                         btn_textinv_manager_sdxl.click(fn=biniouTextinvModelsManager("./models/TextualInversion/SDXL").modelsdeleter, inputs=[list_textinv_manager_sdxl])
                                         btn_textinv_manager_sdxl.click(fn=refresh_textinv_manager_list_sdxl, outputs=list_textinv_manager_sdxl)
                                     with gr.Column():
-                                        btn_textinv_manager_refresh_sdxl = gr.Button("Refresh textual inversion list ♻️")
+                                        btn_textinv_manager_refresh_sdxl = gr.Button(UI_STRINGS["tab_textinv_manager_btn_refresh"])
                                         btn_textinv_manager_refresh_sdxl.click(fn=refresh_textinv_manager_list_sdxl, outputs=list_textinv_manager_sdxl)
                                 with gr.Row():
                                     with gr.Column():
-                                        url_textinv_manager_sdxl = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label="Textual inversion URL", info="Paste here the url of the textual inversion you want to download. Restart biniou to re-synchronize textual inversion list. Safetensors files only.")
+                                        url_textinv_manager_sdxl = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label=UI_STRINGS["tab_textinv_manager_text_url"], info=UI_STRINGS["tab_textinv_manager_text_url_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_url_textinv_manager_sdxl = gr.Button("Download textual inversion 💾", variant="primary")
+                                        btn_url_textinv_manager_sdxl = gr.Button(UI_STRINGS["tab_textinv_manager_btn_download"], variant="primary")
                                         btn_url_textinv_manager_sdxl.click(biniouTextinvModelsManager("./models/TextualInversion/SDXL").modelsdownloader, inputs=url_textinv_manager_sdxl, outputs=url_textinv_manager_sdxl)
                                     with gr.Column():
                                         gr.Number(visible=False)
 
 # SD Models downloader
-                with gr.TabItem("SD models downloader 💾", id=65, visible=False) as tab_sd_models_downloader:
-                    with gr.Accordion("SD models downloader", open=True, visible=True) as acc_sd_models_downloader:
+                with gr.TabItem(UI_STRINGS["tab_sd_downloader"], id=65, visible=False) as tab_sd_models_downloader:
+                    with gr.Accordion(UI_STRINGS["tab_sd_downloader_acc"], open=True, visible=True) as acc_sd_models_downloader:
                         with gr.Row():
                             with gr.Column():
                                 with gr.Row():
                                     with gr.Column():
-                                        url_sd_models_downloader = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label="Stable Diffusion model URL", info="Paste here the url of the model you want to download. Restart biniou to re-synchronize models list. SDXL models must contains \"xl\" in their names to be correctly identified. Safetensors files only.")
+                                        url_sd_models_downloader = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label=UI_STRINGS["tab_sd_downloader_text_url"], info=UI_STRINGS["tab_sd_downloader_text_url_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_url_sd_models_downloader = gr.Button("Download SD model 💾", variant="primary")
+                                        btn_url_sd_models_downloader = gr.Button(UI_STRINGS["tab_sd_downloader_btn_download"], variant="primary")
                                         btn_url_sd_models_downloader.click(biniouSDModelsDownloader("./models/Stable_Diffusion").modelsdownloader, inputs=url_sd_models_downloader, outputs=url_sd_models_downloader)
                                     with gr.Column():
                                             gr.Number(visible=False)
@@ -9964,16 +9968,16 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                             gr.Number(visible=False)
 
 # GGUF Models downloader
-                with gr.TabItem("GGUF models downloader 💾", id=66, visible=False) as tab_gguf_models_downloader:
-                    with gr.Accordion("GGUF models downloader", open=True, visible=True) as acc_gguf_models_downloader:
+                with gr.TabItem(UI_STRINGS["tab_gguf_downloader"], id=66, visible=False) as tab_gguf_models_downloader:
+                    with gr.Accordion(UI_STRINGS["tab_gguf_downloader_acc"], open=True, visible=True) as acc_gguf_models_downloader:
                         with gr.Row():
                             with gr.Column():
                                 with gr.Row():
                                     with gr.Column():
-                                        url_gguf_models_downloader = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label="Chatbot Llama-cpp GGUF model URL", info="Paste here the url of the model you want to download. Restart biniou to re-synchronize models list. gguf files only.")
+                                        url_gguf_models_downloader = gr.Textbox(value="", lines=1, max_lines=2, interactive=True, label=UI_STRINGS["tab_gguf_downloader_text_url"], info=UI_STRINGS["tab_gguf_downloader_text_url_info"])
                                 with gr.Row():
                                     with gr.Column():
-                                        btn_url_gguf_models_downloader = gr.Button("Download GGUF model 💾", variant="primary")
+                                        btn_url_gguf_models_downloader = gr.Button(UI_STRINGS["tab_gguf_downloader_btn_download"], variant="primary")
                                         btn_url_gguf_models_downloader.click(biniouSDModelsDownloader("./models/llamacpp").modelsdownloader, inputs=url_gguf_models_downloader, outputs=url_gguf_models_downloader)
                                     with gr.Column():
                                             gr.Number(visible=False)
@@ -10810,13 +10814,13 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
     vid2vid_ze_pix2pix.click(fn=import_to_module, inputs=[prompt_vid2vid_ze, negative_prompt_vid2vid_ze, tab_image_num, tab_pix2pix_num], outputs=[prompt_pix2pix, negative_prompt_pix2pix, tabs, tabs_image])
 
 # Console output
-    with gr.Accordion("biniou console", open=False):
+    with gr.Accordion(UI_STRINGS["acc_console"], open=False):
         with gr.Row():
             with gr.Column():
-                biniou_console_output = gr.Textbox(label="biniou output", value="", lines=5, max_lines=5, show_copy_button=True)
+                biniou_console_output = gr.Textbox(label=UI_STRINGS["text_console"], value="", lines=5, max_lines=5, show_copy_button=True)
         with gr.Row():
             with gr.Column():
-                download_file_console = gr.File(label="Download logfile", value=logfile_biniou, height=30, interactive=False)
+                download_file_console = gr.File(label=UI_STRINGS["file_console"], value=logfile_biniou, height=30, interactive=False)
                 biniou_console_output.change(refresh_logfile, None, download_file_console)
             with gr.Column():
                 gr.Number(visible=False)
