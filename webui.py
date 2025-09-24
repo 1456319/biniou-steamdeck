@@ -2725,7 +2725,6 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                     with gr.Accordion("About", open=False):
                         with gr.Box():
                             gr.HTML(
-                                """
                                 f"""
                                 <h1 style='text-align: left;'>{UI_STRINGS["about_infos"]}</h1>
                                 <b>{UI_STRINGS["about_module"]}</b>Llava (gguf)</br>
@@ -2735,11 +2734,10 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                 <b>{UI_STRINGS["about_modelpage"]}</b>
                                 {autodoc(list(model_list_llava.keys()))}<br />
                                 """
-                                """
                             )
                         with gr.Box():
                             gr.HTML(
-                                """
+                                f"""
                                 <h1 style='text-align: left;'>{"Help"}</h1>
                                 <div style='text-align: justified'>
                                 <b>{"Usage :"}</b></br>
