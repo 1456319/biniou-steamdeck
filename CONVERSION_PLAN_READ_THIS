@@ -1,0 +1,209 @@
+
+
+**Step 1: Manual Preparation (Downloads)**
+
+1. Create a main folder for the project, named biniou\_portable.  
+2. Inside biniou\_portable, create a subfolder named tools.  
+3. Download and extract the following ZIP files into the tools folder:  
+   * **Python (Embeddable Package):** Download the "Windows embeddable package (64-bit)" from the Python 3.11.9 Downloads page. Extract its contents into a folder named python inside tools.  
+   * **Portable Git:** Download the latest "64-bit Git for Windows Portable" from the official Git website. Extract the contents into a folder named git inside tools.  
+   * **MinGW-w64 (Compiler):** Download the x86\_64-13.2.0-release-posix-seh-ucrt-rt\_v11-rev1.7z file from WinLibs. Extract its contents into a folder named mingw64 inside tools.  
+   * **FFmpeg:** Download the latest GPL release build and extract its contents to a folder named ffmpeg inside tools.
+
+After this, the biniou\_portable/tools folder structure should be:  
+biniou\_portable/  
+└── tools/  
+    ├── python/  
+    ├── git/  
+    ├── mingw64/  
+    └── ffmpeg/  
+**Step 2: Create the Modified** install\_portable.cmd **Script**
+
+1. Create a new file named install\_portable.cmd directly inside the biniou\_portable folder (not inside the tools subfolder).  
+2. Save the following code into the install\_portable.cmd file:
+
+@echo off
+
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\* PORTABLE BINIOU INSTALLER \- NO ADMIN RIGHTS REQUIRED \*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\* Place this script in the root of your portable folder. \*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\* Requires manual download of portable tools first. \*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+
+REM Set the root directory to wherever this script is located  
+set "ROOT\_DIR=%\~dp0"  
+set "BINIOU\_DIR=%ROOT\_DIR%biniou"
+
+REM \--- Define paths to portable tools \---  
+set "PYTHON\_DIR=%ROOT\_DIR%tools\\\\python"  
+set "GIT\_DIR=%ROOT\_DIR%tools\\\\git"  
+set "MINGW\_DIR=%ROOT\_DIR%tools\\\\mingw64"  
+set "FFMPEG\_DIR=%ROOT\_DIR%tools\\\\ffmpeg"
+
+REM Add our portable tools to the PATH for this session only  
+set "PATH=%GIT\_DIR%\\\\cmd;%MINGW\_DIR%\\\\bin;%FFMPEG\_DIR%\\\\bin;%PATH%"
+
+REM Check if tools exist  
+if not exist "%PYTHON\_DIR%\\\\python.exe" (  
+    echo Python not found in %PYTHON\_DIR%. Please download and extract it.  
+    pause  
+    exit /b  
+)  
+if not exist "%GIT\_DIR%\\\\cmd\\\\git.exe" (  
+    echo Git not found in %GIT\_DIR%. Please download and extract it.  
+    pause  
+    exit /b  
+)
+
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\* CLONING REPOSITORY : \*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+echo Cloning Biniou repository...  
+git clone \--branch main https://github.com/Woolverine94/biniou.git "%BINIOU\_DIR%"  
+cd "%BINIOU\_DIR%"  
+git config \--global \--add safe.directory "%BINIOU\_DIR%"
+
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\* CREATING DIRECTORIES : \*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+echo Creating necessary directories...  
+mkdir "%BINIOU\_DIR%\\\\outputs"  
+mkdir "%BINIOU\_DIR%\\\\ssl"  
+mkdir "%BINIOU\_DIR%\\\\models\\\\Audiocraft"
+
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\* INSTALLING PYTHON VIRTUAL ENVIRONMENT : \*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+echo Creating SSL certificate...  
+openssl req \-x509 \-newkey rsa:4096 \-keyout "%BINIOU\_DIR%\\\\ssl\\\\key.pem" \-out "%BINIOU\_DIR%\\\\ssl\\\\cert.pem" \-sha256 \-days 3650 \-nodes \-subj "/C=FR/ST=Paris/L=Paris/O=Biniou/OU=/CN="
+
+echo Creating Python virtual environment...  
+"%PYTHON\_DIR%\\\\python.exe" \-m venv env  
+call "%BINIOU\_DIR%\\\\env\\\\Scripts\\\\activate.bat"
+
+echo Installing Python packages...  
+python \-m pip install \--upgrade pip  
+pip install wheel
+
+echo Installing PyTorch...  
+pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 \--index-url https://download.pytorch.org/whl/cpu
+
+echo Compiling and installing llama-cpp-python...  
+REM \--- This is the critical step: tell pip to use the portable MinGW compiler \---  
+set CMAKE\_ARGS="-G MinGW Makefiles"  
+set FORCE\_CMAKE=1  
+pip install llama-cpp-python \--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \--no-cache-dir
+
+echo Installing remaining requirements...  
+pip install \-r requirements.txt
+
+REM Cleanup environment variables  
+set CMAKE\_ARGS=  
+set FORCE\_CMAKE=
+
+echo Installation finished\!  
+echo You can now launch Biniou by double-clicking "%BINIOU\_DIR%\\\\webui.cmd"  
+pause  
+Once these steps are completed, the entire application and its dependencies will be contained within the biniou\_portable directory, requiring no administrator rights."  
+this script cannot be run without administrator privileges in its current form.  
+The installation will fail because it attempts to run several installers for system-wide software that require elevated permissions to write to protected directories like C:\\Program Files and C:\\Windows.  
+Why It Needs Admin Rights  
+The following commands are the primary "admin blockers" in the script:  
+start /wait %tmp%\\vs\_BuildTools.exe: Visual Studio Build Tools is a core developer toolset from Microsoft. Its installer requires admin rights to register components and install compilers system-wide.
+
+start /wait %tmp%\\git.exe: The standard Git for Windows installer needs admin rights to install into C:\\Program Files\\Git and add itself to the system's PATH variable.  
+start /wait %tmp%\\openssl.exe: The FireDaemon OpenSSL installer also defaults to C:\\Program Files and requires admin permissions.  
+start /wait %tmp%\\python.exe: The official Python installer requires admin rights for a system-wide "All Users" installation, which is the default for a /passive install.  
+start /wait %tmp%\\vcredist.exe: The Visual C++ Redistributable installs shared system libraries into the C:\\Windows\\System32 folder, which is highly protected and absolutely requires admin rights.  
+Attempting to run this on a restricted Citrix desktop will cause each of these steps to fail, halting the installation.  
+How to Create a Portable, Admin-Free Installation  
+You can achieve your goal of a sandboxed, single-directory installation by replacing the installers with their portable versions and modifying the script to use them. This approach confines all the necessary programs and files to one main folder, which can be placed in your user directory (e.g., on your Desktop or in Documents).  
+The main challenge is replacing the Visual Studio Build Tools, which are needed to compile llama-cpp-python. We can replace this with a portable version of the MinGW-w64 C++ compiler.  
+Here is a revised script and the manual steps you'll need to take first.  
+Step 1: Manual Preparation (Downloads)  
+Before running the script, you must manually download and set up the portable tools.  
+Create a main folder for your project. Let's call it biniou\_portable.  
+Inside biniou\_portable, create a subfolder named tools.  
+Download the following ZIP files and extract them into the tools folder:  
+Python (Embeddable Package): Go to the Python 3.11.9 Downloads page and get the "Windows embeddable package (64-bit)". Extract its contents into a folder named python inside tools.  
+Portable Git: Download the latest "64-bit Git for Windows Portable" from the official Git website. Extract the contents into a folder named git inside tools.  
+MinGW-w64 (Compiler): Download the x86\_64-13.2.0-release-posix-seh-ucrt-rt\_v11-rev1.7z file from WinLibs. This contains the GCC compiler needed to replace VS Build Tools. Extract its contents into a folder named mingw64 inside tools.  
+FFmpeg: The script already uses a portable version. We'll just adjust its location.  
+Download the latest GPL release build and extract its contents to a folder named ffmpeg inside tools.  
+After this step, your biniou\_portable\\tools folder should look like this:  
+biniou\_portable/  
+└── tools/  
+├── python/  
+├── git/  
+├── mingw64/  
+└── ffmpeg/  
+Step 2: The Modified install\_portable.cmd Script  
+Save the following code as install\_portable.cmd directly inside your biniou\_portable folder (not inside the tools subfolder). When you run it, it will use the portable tools you just set up.  
+@echo off  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\* PORTABLE BINIOU INSTALLER \- NO ADMIN RIGHTS REQUIRED \*\*\*  
+REM \*\*\* Place this script in the root of your portable folder. \*\*\*  
+REM \*\*\* Requires manual download of portable tools first. \*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM Set the root directory to wherever this script is located  
+set "ROOT\_DIR=%\~dp0"  
+set "BINIOU\_DIR=%ROOT\_DIR%biniou"  
+REM \--- Define paths to portable tools \---  
+set "PYTHON\_DIR=%ROOT\_DIR%tools\\python"  
+set "GIT\_DIR=%ROOT\_DIR%tools\\git"  
+set "MINGW\_DIR=%ROOT\_DIR%tools\\mingw64"  
+set "FFMPEG\_DIR=%ROOT\_DIR%tools\\ffmpeg"  
+REM Add our portable tools to the PATH for this session only  
+set "PATH=%GIT\_DIR%\\cmd;%MINGW\_DIR%\\bin;%FFMPEG\_DIR%\\bin;%PATH%"  
+REM Check if tools exist  
+if not exist "%PYTHON\_DIR%\\python.exe" (  
+echo Python not found in %PYTHON\_DIR%. Please download and extract it.  
+pause  
+exit /b  
+)  
+if not exist "%GIT\_DIR%\\cmd\\git.exe" (  
+echo Git not found in %GIT\_DIR%. Please download and extract it.  
+pause  
+exit /b  
+)  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\* CLONING REPOSITORY : \*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+echo Cloning Biniou repository...  
+git clone \--branch main https://github.com/Woolverine94/biniou.git "%BINIOU\_DIR%"  
+cd "%BINIOU\_DIR%"  
+git config \--global \--add safe.directory "%BINIOU\_DIR%"  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\* CREATING DIRECTORIES : \*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+echo Creating necessary directories...  
+mkdir "%BINIOU\_DIR%\\outputs"  
+mkdir "%BINIOU\_DIR%\\ssl"  
+mkdir "%BINIOU\_DIR%\\models\\Audiocraft"  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+REM \*\*\* INSTALLING PYTHON VIRTUAL ENVIRONMENT : \*\*\*  
+REM \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*  
+echo Creating SSL certificate...  
+openssl req \-x509 \-newkey rsa:4096 \-keyout "%BINIOU\_DIR%\\ssl\\key.pem" \-out "%BINIOU\_DIR%\\ssl\\cert.pem" \-sha256 \-days 3650 \-nodes \-subj "/C=FR/ST=Paris/L=Paris/O=Biniou/OU=/CN="  
+echo Creating Python virtual environment...  
+"%PYTHON\_DIR%\\python.exe" \-m venv env  
+call "%BINIOU\_DIR%\\env\\Scripts\\activate.bat"  
+echo Installing Python packages...  
+python \-m pip install \--upgrade pip  
+pip install wheel  
+echo Installing PyTorch...  
+pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 \--index-url https://download.pytorch.org/whl/cpu  
+echo Compiling and installing llama-cpp-python...  
+REM \--- This is the critical step: tell pip to use the portable MinGW compiler \---  
+set CMAKE\_ARGS="-G MinGW Makefiles"  
+set FORCE\_CMAKE=1  
+pip install llama-cpp-python \--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \--no-cache-dir  
+echo Installing remaining requirements...  
+pip install \-r requirements.txt  
+REM Cleanup environment variables  
+set CMAKE\_ARGS=  
+set FORCE\_CMAKE=  
+echo Installation finished\!  
+echo You can now launch Biniou by double-clicking "%BINIOU\_DIR%\\webui.cmd"  
+pause  
+By using this portable method, the entire application and its dependencies are contained within the biniou\_portable directory, requiring no administrator rights and leaving the underlying Citrix system untouched.
