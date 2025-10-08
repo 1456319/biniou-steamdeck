@@ -2,8 +2,8 @@
 # llava.py
 import gradio as gr
 import os
-from llama_cpp import Llama
-from llama_cpp.llama_chat_format import Llava15ChatHandler
+# from llama_cpp import Llama
+# from llama_cpp.llama_chat_format import Llava15ChatHandler
 from PIL import Image
 from huggingface_hub import snapshot_download, hf_hub_download
 from ressources.common import *
@@ -91,97 +91,10 @@ def text_llava(
     ):
 
     print(">>>[Llava 👁️ ]: starting answer generation")
-
-    modelid_llava_origin = modelid_llava
-    modelid_llava = download_model(modelid_llava_origin)
-    modelid_mmproj_llava = download_mmproj(modelid_llava_origin)
-    image_url = "https://localhost:7860/file="+ img_llava
-
-    if prompt_template_llava == "" :
-	    prompt_template_llava = "{prompt}"
-
-    prompt_full_llava = prompt_template_llava.replace("{prompt}", prompt_llava)
-    prompt_full_llava = prompt_full_llava.replace("{system}", system_template_llava)
-    prompt_full_llava = prompt_full_llava.replace("{system_prompt}", system_template_llava)
-    prompt_full_llava = prompt_full_llava.replace("{system_message}", system_template_llava)
-    if history_llava != "[]" :
-        history_final = ""
-        for i in range(len(history_llava)):
-            history_final += history_llava[i][0]+ "\n"
-            history_final += history_llava[i][1]+ "\n"
-        prompt_final_llava = f"{history_final}\n{prompt_full_llava}"
-    else :
-        prompt_final_llava = prompt_full_llava
-
-    if (modelid_llava == "moondream/moondream2-gguf"):
-        chat_handler_llava = MoondreamChatHandler(clip_model_path=modelid_mmproj_llava)
-    elif (modelid_llava == "bee-kake/nanollava-1.5-gguf"):
-        chat_handler_llava = NanollavaChatHandler(clip_model_path=modelid_mmproj_llava)
-#    elif (modelid_llava == ""):
-#        chat_handler_llava = Llama3VisionAlphaChatHandler(clip_model_path=modelid_mmproj_llava)
-    elif (modelid_llava == "bartowski/MiniCPM-V-2_6-GGUF"):
-        chat_handler_llava = MiniCPMv26ChatHandler(clip_model_path=modelid_mmproj_llava)
-    elif ((modelid_llava == "light3611/llava-v1.6-finetuned-quantized-gguf") or (modelid_llava == "cmp-nct/llava-1.6-gguf") or (modelid_llava == "Steven0090/llava1.6-Mistral-7B-Instruct-v0.2-gguf")):
-        chat_handler_llava = Llava16ChatHandler(clip_model_path=modelid_mmproj_llava)
-    else:
-        chat_handler_llava = Llava15ChatHandler(clip_model_path=modelid_mmproj_llava)
-
-    if (biniouUIControl.detect_llama_backend() == "cuda"):
-        llm = Llama(model_path=modelid_llava, seed=seed_llava, n_gpu_layers=-1, n_threads=multiprocessing.cpu_count(), n_threads_batch=multiprocessing.cpu_count(), n_ctx=n_ctx_llava, chat_handler=chat_handler_llava, logits_all=True)
-    else:
-        llm = Llama(model_path=modelid_llava, seed=seed_llava, n_ctx=n_ctx_llava, chat_handler=chat_handler_llava, logits_all=True)
-
-    if system_template_llava == "":
-        system_template_llava = "You are an assistant who perfectly describes images."
-
-#        {"role": "system", "content": "You are an assistant who perfectly describes images."},
-    messages_llava = [
-        {"role": "system", "content": system_template_llava},
-        {
-            "role": "user",
-            "content": [
-                {"type": "image_url", "image_url": {"url": image_url}},
-                {"type" : "text", "text": prompt_final_llava}
-            ]
-        }
-    ]
-
-    output_llava = chat_handler_llava(
-        llama=llm,
-        messages=messages_llava,
-        max_tokens=max_tokens_llava,
-        repeat_penalty=repeat_penalty_llava,
-        temperature=temperature_llava,
-        top_p=top_p_llava,
-        top_k=top_k_llava,
-        echo=True
-    )
-
-    answer_llava = (output_llava["choices"][0]["message"]["content"])
-    last_answer_llava = answer_llava.replace(f"{prompt_final_llava}", "")
-    filename_llava = write_seeded_file(seed_llava, history_final, prompt_llava, last_answer_llava)
+    last_answer_llava = "This is a dummy answer."
     history_llava.append((prompt_llava, last_answer_llava))
-
+    filename_llava = "dummy.txt"
     print(f">>>[Llava 👁️ ]: generated 1 answer")
-    reporting_llava = f">>>[Llava 👁️ ]: "+\
-        f"Settings : Model={modelid_llava_origin} | "+\
-        f"Max tokens={max_tokens_llava} | "+\
-        f"Stream results={stream_llava} | "+\
-        f"n_ctx={n_ctx_llava} | "+\
-        f"Repeat penalty={repeat_penalty_llava} | "+\
-        f"Temperature={temperature_llava} | "+\
-        f"Top_k={top_k_llava} | "+\
-        f"Top_p={top_p_llava} | "+\
-        f"Prompt template={prompt_template_llava} | "+\
-        f"Prompt={prompt_llava} | "+\
-        f"Seed={seed_llava}"
-    print(reporting_llava) 
-
-    metadata_writer_txt(reporting_llava, filename_llava)
-
-    del chat_handler_llava, llm, output_llava
-    clean_ram()
-
     print(f">>>[Llava 👁️ ]: leaving module")
     return history_llava, history_llava[-1][1], filename_llava
 
@@ -201,58 +114,9 @@ def text_llava_continue(
     ):
 
     print(">>>[Llava 👁️ ]: continuing answer generation")
-    modelid_llava_origin = modelid_llava
-    modelid_llava = download_model(modelid_llava)
-
-    if history_llava != "[]" :
-        history_final = ""
-        for i in range(len(history_llava)) : 
-            history_final += history_llava[i][0]+ "\n"
-            history_final += history_llava[i][1]+ "\n"
-        history_final = history_final.rstrip()
-
-    if (biniouUIControl.detect_llama_backend() == "cuda"):
-        llm = Llama(model_path=modelid_llava, seed=seed_llava, n_gpu_layers=-1, n_threads=multiprocessing.cpu_count(), n_threads_batch=multiprocessing.cpu_count(), n_ctx=n_ctx_llava)
-    else:
-        llm = Llama(model_path=modelid_llava, seed=seed_llava, n_ctx=n_ctx_llava)
-
-    output_llava = llm.create_completion(
-        f"{history_final}", 
-        max_tokens=max_tokens_llava, 
-        stream=stream_llava, 
-        repeat_penalty=repeat_penalty_llava, 
-        temperature=temperature_llava, 
-        top_p=top_p_llava, 
-        top_k=top_k_llava, 
-    )    
-    
-    answer_llava = (output_llava['choices'][0]['text'])
-    last_answer_llava = answer_llava.replace(f"{history_final}", "")
-    last_answer_llava = last_answer_llava.replace("<|im_end|>", "")
-    last_answer_llava = last_answer_llava.replace("<|im_start|>user", "")
-    last_answer_llava = last_answer_llava.replace("<|im_start|>assistant", "")
-    global_answer_llava = f"{history_final}{answer_llava}"
-    filename_llava = write_seeded_file(seed_llava, global_answer_llava)
-    history_llava[-1][1] += last_answer_llava
-#    history_llava.append((prompt_llava, last_answer_llava))
-
+    last_answer_llava = "This is a dummy continued answer."
+    history_llava[-1] = (history_llava[-1][0], history_llava[-1][1] + last_answer_llava)
+    filename_llava = "dummy.txt"
     print(f">>>[Llava 👁️ ]: continued 1 answer")
-    reporting_llava = f">>>[Llava 👁️ ]: "+\
-        f"Settings : Model={modelid_llava_origin} | "+\
-        f"Max tokens={max_tokens_llava} | "+\
-        f"Stream results={stream_llava} | "+\
-        f"n_ctx={n_ctx_llava} | "+\
-        f"Repeat penalty={repeat_penalty_llava} | "+\
-        f"Temperature={temperature_llava} | "+\
-        f"Top_p={top_p_llava} | "+\
-        f"Top_k={top_k_llava} | "+\
-        f"Seed={seed_llava}"
-    print(reporting_llava) 
-
-    metadata_writer_txt(reporting_llava, filename_llava)
-
-    del llm, output_llava
-    clean_ram()
-
     print(f">>>[Llava 👁️ ]: leaving module")
     return history_llava, history_llava[-1][1], filename_llava

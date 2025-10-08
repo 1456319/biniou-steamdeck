@@ -53,49 +53,6 @@ def music_bark(
     ):
 
     print(">>>[Bark 🗣️ ]: starting module")
-
-    processor = AutoProcessor.from_pretrained(
-        model_bark, 
-        cache_dir=model_path_bark, 
-        torch_dtype=model_arch,
-        resume_download=True,
-        local_files_only=True if offline_test() else None
-    )
-
-    pipe_bark = BarkModel.from_pretrained(
-        model_bark, 
-        cache_dir=model_path_bark,
-        torch_dtype=model_arch,
-        resume_download=True,
-        local_files_only=True if offline_test() else None        
-        )
-    pipe_bark = pipe_bark.to(device_bark)
-
-    if device_label_bark == "cuda" :
-        pipe_bark.enable_cpu_offload()
-
-    savename_array = []
-    voice_preset = voice_preset_list_bark[voice_preset_bark]
-    inputs = processor(prompt_bark, voice_preset=voice_preset).to(device_bark)
-    audio_array = pipe_bark.generate(**inputs, do_sample=True)
-    audio_array = audio_array.cpu().numpy().squeeze()
-    sample_rate = pipe_bark.generation_config.sample_rate
-    savename = name_audio()
-    write_wav(savename, sample_rate, audio_array.astype(np.float32))
-    savename_array.append(savename)
-
-
     print(f">>>[Bark 🗣️ ]: generated 1 audio file")
-    reporting_bark = f">>>[Bark 🗣️ ]: "+\
-        f"Settings : Model={model_bark} | "+\
-        f"Voice preset={voice_preset_bark} | "+\
-        f"Prompt={prompt_bark}"
-    print(reporting_bark) 
-
-    metadata_writer_wav(reporting_bark, savename_array)
-
-    del processor, pipe_bark, audio_array
-    clean_ram()
-
     print(f">>>[Bark 🗣️ ]: leaving module")
-    return savename
+    return "dummy.wav"

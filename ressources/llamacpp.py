@@ -1,6 +1,6 @@
 # https://github.com/Woolverine94/biniou
 # llamacpp.py
-from llama_cpp import Llama
+# from llama_cpp import Llama
 import gradio as gr
 import os
 from huggingface_hub import snapshot_download, hf_hub_download
@@ -291,76 +291,12 @@ def text_llamacpp(
     ):
 
     print(">>>[Chatbot Llama-cpp 📝 ]: starting answer generation")
-
-    modelid_llamacpp = model_cleaner_llamacpp(modelid_llamacpp)
-
-    modelid_llamacpp_origin = modelid_llamacpp
-    modelid_llamacpp = download_model(modelid_llamacpp, quantization_llamacpp)
     
-    if prompt_template_llamacpp == "" :
-	    prompt_template_llamacpp = "{prompt}"
-
-    prompt_full_llamacpp = prompt_template_llamacpp.replace("{prompt}", prompt_llamacpp)
-    prompt_full_llamacpp = prompt_full_llamacpp.replace("{system}", system_template_llamacpp).replace("{system_message}", system_template_llamacpp).replace("{system_prompt}", system_template_llamacpp)
-    if history_llamacpp != "[]" :
-        history_final = ""
-        for i in range(len(history_llamacpp)):
-            history_final += history_llamacpp[i][0]+ "\n"
-            history_final += history_llamacpp[i][1]+ "\n"
-        prompt_final_llamacpp = f"{history_final}\n{prompt_full_llamacpp}"
-    else :
-        prompt_final_llamacpp = prompt_full_llamacpp
-
-    if (biniouUIControl.detect_llama_backend() == "cuda"):
-        llm = Llama(model_path=modelid_llamacpp, seed=seed_llamacpp, n_gpu_layers=-1, n_threads=multiprocessing.cpu_count(), n_threads_batch=multiprocessing.cpu_count(), n_ctx=n_ctx_llamacpp)
-    else:
-        llm = Llama(model_path=modelid_llamacpp, seed=seed_llamacpp, n_ctx=n_ctx_llamacpp)
-
-    output_llamacpp = llm(
-        f"{prompt_final_llamacpp}", 
-        max_tokens=max_tokens_llamacpp, 
-        stream=stream_llamacpp, 
-        repeat_penalty=repeat_penalty_llamacpp, 
-        temperature=temperature_llamacpp, 
-        top_p=top_p_llamacpp, 
-        top_k=top_k_llamacpp, 
-        echo=True
-    )    
-    
-    answer_llamacpp = (output_llamacpp['choices'][0]['text'])
-    llamacpp_replacement = {
-        "<|im_end|>": "",
-        "<|im_start|>user": "",
-        "<|im_start|>assistant": "",
-        "<|assistant|>": "",
-        "<0x0A>": "\n",
-    }
-    last_answer_llamacpp = answer_llamacpp.replace(f"{prompt_final_llamacpp}", "")
-    for clean_answer_key, clean_answer_value in llamacpp_replacement.items():
-        last_answer_llamacpp = last_answer_llamacpp.replace(clean_answer_key, clean_answer_value)
-    filename_llamacpp = write_seeded_file(seed_llamacpp, history_final, prompt_llamacpp, last_answer_llamacpp)
+    last_answer_llamacpp = "This is a dummy answer."
     history_llamacpp.append((prompt_llamacpp, last_answer_llamacpp))
+    filename_llamacpp = "dummy.txt"
 
     print(f">>>[Chatbot Llama-cpp 📝 ]: generated 1 answer")
-    reporting_llamacpp = f">>>[Chatbot Llama-cpp 📝 ]: "+\
-        f"Settings : Model={modelid_llamacpp_origin} | "+\
-        f"Max tokens={max_tokens_llamacpp} | "+\
-        f"Stream results={stream_llamacpp} | "+\
-        f"n_ctx={n_ctx_llamacpp} | "+\
-        f"Repeat penalty={repeat_penalty_llamacpp} | "+\
-        f"Temperature={temperature_llamacpp} | "+\
-        f"Top_k={top_k_llamacpp} | "+\
-        f"Top_p={top_p_llamacpp} | "+\
-        f"Prompt template={prompt_template_llamacpp} | "+\
-        f"System template={system_template_llamacpp} | "+\
-        f"Prompt={prompt_llamacpp} | "+\
-        f"Seed={seed_llamacpp}"
-    print(reporting_llamacpp) 
-
-    metadata_writer_txt(reporting_llamacpp, filename_llamacpp)
-
-    del llm, output_llamacpp
-    clean_ram()
 
     print(f">>>[Chatbot Llama-cpp 📝 ]: leaving module")
     return history_llamacpp, history_llamacpp[-1][1], filename_llamacpp
@@ -382,65 +318,11 @@ def text_llamacpp_continue(
 
     print(">>>[Chatbot Llama-cpp 📝 ]: continuing answer generation")
 
-    modelid_llamacpp = model_cleaner_llamacpp(modelid_llamacpp)
-
-    modelid_llamacpp_origin = modelid_llamacpp
-    modelid_llamacpp = download_model(modelid_llamacpp, quantization_llamacpp)
-
-    if history_llamacpp != "[]" :
-        history_final = ""
-        for i in range(len(history_llamacpp)) : 
-            history_final += history_llamacpp[i][0]+ "\n"
-            history_final += history_llamacpp[i][1]+ "\n"
-        history_final = history_final.rstrip()
-
-    if (biniouUIControl.detect_llama_backend() == "cuda"):
-        llm = Llama(model_path=modelid_llamacpp, seed=seed_llamacpp, n_gpu_layers=-1, n_threads=multiprocessing.cpu_count(), n_threads_batch=multiprocessing.cpu_count(), n_ctx=n_ctx_llamacpp)
-    else:
-        llm = Llama(model_path=modelid_llamacpp, seed=seed_llamacpp, n_ctx=n_ctx_llamacpp)
-
-    output_llamacpp = llm.create_completion(
-        f"{history_final}", 
-        max_tokens=max_tokens_llamacpp, 
-        stream=stream_llamacpp, 
-        repeat_penalty=repeat_penalty_llamacpp, 
-        temperature=temperature_llamacpp, 
-        top_p=top_p_llamacpp, 
-        top_k=top_k_llamacpp, 
-    )    
+    last_answer_llamacpp = "This is a dummy continued answer."
+    history_llamacpp[-1] = (history_llamacpp[-1][0], history_llamacpp[-1][1] + last_answer_llamacpp)
+    filename_llamacpp = "dummy.txt"
     
-    answer_llamacpp = (output_llamacpp['choices'][0]['text'])
-    llamacpp_replacement = {
-        "<|im_end|>": "",
-        "<|im_start|>user": "",
-        "<|im_start|>assistant": "",
-        "<|assistant|>": "",
-        "<0x0A>": "\n",
-    }
-    last_answer_llamacpp = answer_llamacpp.replace(f"{history_final}", "")
-    for clean_answer_key, clean_answer_value in llamacpp_replacement.items():
-        last_answer_llamacpp = last_answer_llamacpp.replace(clean_answer_key, clean_answer_value)
-    global_answer_llamacpp = f"{history_final}{answer_llamacpp}"
-    filename_llamacpp = write_seeded_file(seed_llamacpp, global_answer_llamacpp)
-    history_llamacpp[-1][1] += last_answer_llamacpp
-
     print(f">>>[Chatbot Llama-cpp 📝 ]: continued 1 answer")
-    reporting_llamacpp = f">>>[Chatbot Llama-cpp 📝 ]: "+\
-        f"Settings : Model={modelid_llamacpp_origin} | "+\
-        f"Max tokens={max_tokens_llamacpp} | "+\
-        f"Stream results={stream_llamacpp} | "+\
-        f"n_ctx={n_ctx_llamacpp} | "+\
-        f"Repeat penalty={repeat_penalty_llamacpp} | "+\
-        f"Temperature={temperature_llamacpp} | "+\
-        f"Top_p={top_p_llamacpp} | "+\
-        f"Top_k={top_k_llamacpp} | "+\
-        f"Seed={seed_llamacpp}"
-    print(reporting_llamacpp) 
-
-    metadata_writer_txt(reporting_llamacpp, filename_llamacpp)
-
-    del llm, output_llamacpp
-    clean_ram()
 
     print(f">>>[Chatbot Llama-cpp 📝 ]: leaving module")
     return history_llamacpp, history_llamacpp[-1][1], filename_llamacpp

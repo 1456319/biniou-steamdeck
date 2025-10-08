@@ -60,42 +60,6 @@ def music_musicgen(
     ):
 
     print(">>>[MusicGen 🎶 ]: starting module")
-
-    pipe_musicgen = MusicGen.get_pretrained(model_musicgen, device=device_musicgen)
-    pipe_musicgen.set_generation_params(
-        duration=duration_musicgen, 
-        use_sampling=use_sampling_musicgen, 
-        temperature=temperature_musicgen, 
-        top_k=top_k_musicgen, 
-        top_p=top_p_musicgen, 
-        cfg_coef=cfg_coef_musicgen
-    )
-    pipe_musicgen.set_custom_progress_callback(check_musicgen)
-    prompt_musicgen_final = [f"{prompt_musicgen}"]
-    savename_array = []
-    for i in range (num_batch_musicgen):
-        wav = pipe_musicgen.generate(prompt_musicgen_final, progress=True)
-        for idx, one_wav in enumerate(wav):
-            savename, savename_final = name_idx_audio(idx)
-            audio_write(savename, one_wav.cpu(), pipe_musicgen.sample_rate, strategy="loudness", loudness_compressor=True)
-            savename_array.append(savename_final)
-
     print(f">>>[MusicGen 🎶 ]: generated {num_batch_musicgen} batch(es) of 1")
-    reporting_musicgen = f">>>[MusicGen 🎶 ]: "+\
-        f"Settings : Model={model_musicgen} | "+\
-        f"Duration={duration_musicgen} | "+\
-        f"CFG scale={cfg_coef_musicgen} | "+\
-        f"Use sampling={use_sampling_musicgen} | "+\
-        f"Temperature={temperature_musicgen} | "+\
-        f"Top_k={top_k_musicgen} | "+\
-        f"Top_p={top_p_musicgen} | "+\
-        f"Prompt={prompt_musicgen}"
-    print(reporting_musicgen)
-
-    metadata_writer_wav(reporting_musicgen, savename_array)
-
-    del pipe_musicgen
-    clean_ram()
-
     print(f">>>[MusicGen 🎶 ]: leaving module")
-    return savename_final
+    return "dummy.wav"

@@ -2,7 +2,7 @@
 # Webui.py
 # import diffusers
 # diffusers.utils.USE_PEFT_BACKEND = False
-from llama_cpp import Llama
+# from llama_cpp import Llama
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 import warnings
@@ -71,18 +71,16 @@ get_window_url_params = """
 
 def split_url_params(url_params) :
     url_params = eval(url_params.replace("'", "\""))
-    if "nsfw_filter" in url_params.keys():
-        output_nsfw = url_params["nsfw_filter"]
-        return output_nsfw, url_params, bool(int(output_nsfw))
-    else :         
-        return "1", url_params, "1"
+    # if "nsfw_filter" in url_params.keys():
+    #     output_nsfw = url_params["nsfw_filter"]
+    #     return output_nsfw, url_params, bool(int(output_nsfw))
+    # else :
+    return "0", url_params, "0"
 
 biniou_global_lang_ui = "lang_en_US"
 biniou_global_server_name = True
 biniou_global_server_port = 7860
 biniou_global_inbrowser = False
-biniou_global_auth = False
-biniou_global_auth_message = "Welcome to biniou !"
 biniou_global_share = False
 biniou_global_steps_max = 100
 biniou_global_batch_size_max = 4
@@ -109,14 +107,7 @@ if test_cfg_exist("settings") :
     with open(".ini/settings.cfg", "r", encoding="utf-8") as fichier:
         exec(fichier.read())
 
-if not os.path.isfile(".ini/auth.cfg"):
-    write_auth("biniou:biniou")
-
-if biniou_global_auth == True:
-    biniou_auth_values = read_auth()
-
-if biniou_global_auth == False:
-    biniou_global_share = False
+biniou_global_share = False
 
 with open("./version", "r", encoding="utf-8") as fichier:
     biniou_global_version = fichier.read()
@@ -2400,33 +2391,8 @@ def refresh_textinv_manager_list_sd():
 def refresh_textinv_manager_list_sdxl():
     return gr.CheckboxGroup(choices=biniouTextinvModelsManager("./models/TextualInversion/SDXL").modelslister(), value=None, type="value", label=biniou_lang_tab_textinv_models_label, info=biniou_lang_tab_textinv_models_info)
 
-## Authentication functions
-
-def biniou_settings_login(user, password):
-    admin_user, admin_pass = biniouUIControl.check_login_reader()
-    if (user == admin_user) and (password == admin_pass):
-        return acc_webui.update(visible=True), acc_models_cleaner.update(visible=True), acc_lora_models_manager.update(visible=True), acc_textinv_manager.update(visible=True), acc_sd_models_downloader.update(visible=True), acc_gguf_models_downloader.update(visible=True), biniou_login_user.update(value=""), biniou_login_pass.update(value=""), biniou_login_test.update(value="True")
-    else:
-        return acc_webui.update(), acc_models_cleaner.update(), acc_lora_models_manager.update(), acc_textinv_manager.update(), acc_sd_models_downloader.update(), acc_gguf_models_downloader.update(), biniou_login_user.update(), biniou_login_pass.update(), biniou_login_test.update(value="False")
-
-def biniou_settings_login_test(test):
-    if test == "True":
-        return gr.Info(biniou_lang_tab_login_test_success)
-    elif test == "False":
-        return gr.Info(biniou_lang_tab_login_test_fail)
-
-def biniou_settings_login_test_clean():
-    return biniou_login_test.update(value="")
-
-def biniou_settings_logout():
-    return acc_webui.update(visible=False), acc_models_cleaner.update(visible=False), acc_lora_models_manager.update(visible=False), acc_textinv_manager.update(visible=False), acc_sd_models_downloader.update(visible=False), acc_gguf_models_downloader.update(visible=False), biniou_login_user.update(""), biniou_login_pass.update("")
 
 ## Functions specific to Common settings
-def biniou_global_settings_auth_switch(auth_value):
-	if auth_value:
-		return biniou_global_settings_auth_message.update(interactive=True), biniou_global_settings_share.update(interactive=True)
-	else:
-		return biniou_global_settings_auth_message.update(interactive=False), biniou_global_settings_share.update(value=False, interactive=False)
 
 ## Functions specific to console
 def refresh_logfile():
@@ -2497,7 +2463,7 @@ theme_gradio = gr.themes.Base().set(
 )
 
 with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
-    nsfw_filter = gr.Textbox(value="1", visible=False)
+    nsfw_filter = gr.Textbox(value="0", visible=False)
     url_params_current = gr.Textbox(value="", visible=False)
     banner_biniou = gr.HTML("""""", visible=False)
     url_params_current.change(url_params_theme, url_params_current, [banner_biniou, banner_biniou], show_progress="hidden")
@@ -9741,17 +9707,7 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                          with gr.Accordion(biniou_lang_tab_login_acc, open=True):
                              with gr.Row():
                                  with gr.Column():
-                                     biniou_login_user = gr.Textbox(value="", lines=1, max_lines=1, label=biniou_lang_tab_login_user_label, info=biniou_lang_tab_login_user_info)
-                                 with gr.Column():
-                                     biniou_login_pass = gr.Textbox(value="", lines=1, max_lines=1, type="password", label=biniou_lang_tab_login_pass_label, info=biniou_lang_tab_login_pass_info)
-                             with gr.Row():
-                                 with gr.Column():
-                                     btn_biniou_login = gr.Button(f"{biniou_lang_tab_login_btn_login} 🔑")
-                                 with gr.Column():
-                                     btn_biniou_logout = gr.Button(f"{biniou_lang_tab_login_btn_logout} 🔓")
-                                 with gr.Column():
-                                     btn_biniou_login_clear_input = gr.ClearButton(components=[biniou_login_user, biniou_login_pass], value=f"{biniou_lang_clear_inputs} 🧹")
-                                     biniou_login_test = gr.Textbox(value="", visible=False)
+                                     gr.Markdown("Authentication has been removed.")
 # UI settings
                 with gr.TabItem(f"{biniou_lang_tab_webui} 🧠", id=61) as tab_webui:
                     with gr.Accordion(biniou_lang_tab_webui, open=True, visible=False) as acc_webui:
@@ -9816,12 +9772,7 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                             biniou_global_settings_inbrowser = gr.Checkbox(value=biniou_global_inbrowser, label=biniou_lang_tab_webui_settings_inbrowser_label, info=biniou_lang_tab_webui_settings_inbrowser_info, interactive=True)
                                     with gr.Row():
                                         with gr.Column():
-                                            biniou_global_settings_auth = gr.Checkbox(value=biniou_global_auth, label=biniou_lang_tab_webui_settings_auth_label, info=biniou_lang_tab_webui_settings_auth_info, interactive=True)
-                                        with gr.Column():
-                                            biniou_global_settings_auth_message = gr.Textbox(value=biniou_global_auth_message, lines=1, max_lines=3, label=biniou_lang_tab_webui_settings_auth_msg_label, info=biniou_lang_tab_webui_settings_auth_msg_info, interactive=True if biniou_global_auth else False)
-                                        with gr.Column():
-                                            biniou_global_settings_share = gr.Checkbox(value=biniou_global_share, label=biniou_lang_tab_webui_settings_share_label, info=f"⚠️ {biniou_lang_tab_webui_settings_share_info}⚠️", interactive=True if biniou_global_auth else False)
-                                            biniou_global_settings_auth.change(biniou_global_settings_auth_switch, biniou_global_settings_auth, [biniou_global_settings_auth_message, biniou_global_settings_share])
+                                            biniou_global_settings_share = gr.Checkbox(value=biniou_global_share, label=biniou_lang_tab_webui_settings_share_label, info=f"⚠️ {biniou_lang_tab_webui_settings_share_info}⚠️", interactive=True)
                                 with gr.Accordion(biniou_lang_tab_webui_settings_image, open=True):
                                     with gr.Row():
                                         with gr.Column():
@@ -9916,12 +9867,6 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                         del_ini_btn_settings.click(fn=lambda: del_cfg(module_name_settings.value))
                                         del_ini_btn_settings.click(fn=lambda: gr.Info(biniou_lang_tab_webui_settings_deleted))
                                         del_ini_btn_settings.click(fn=lambda: del_ini_btn_settings.update(interactive=False), outputs=del_ini_btn_settings)
-                        with gr.Row():
-                            with gr.Accordion(biniou_lang_tab_webui_nsfw_title, open=False):
-                                with gr.Row():
-                                    with gr.Column():
-                                        safety_checker_ui_settings = gr.Checkbox(bool(int(nsfw_filter.value)), label=biniou_lang_tab_webui_nsfw_label, info=f"⚠️ {biniou_lang_tab_webui_nsfw_info} ⚠️", interactive=True)
-                                        safety_checker_ui_settings.change(fn=lambda x:int(x), inputs=safety_checker_ui_settings, outputs=nsfw_filter)
 # Models cleaner
                 with gr.TabItem(f"{biniou_lang_tab_cleaner} 🧹", id=62) as tab_models_cleaner:
                     with gr.Accordion(biniou_lang_tab_cleaner, open=True, visible=False) as acc_models_cleaner:
@@ -10070,41 +10015,6 @@ with gr.Blocks(theme=theme_gradio, title="biniou") as demo:
                                             gr.Number(visible=False)
                                     with gr.Column():
                                             gr.Number(visible=False)
-                btn_biniou_login.click(
-                    fn=biniou_settings_login,
-                    inputs=[
-                        biniou_login_user,
-                        biniou_login_pass
-                    ],
-                    outputs=[
-                        acc_webui,
-                        acc_models_cleaner,
-                        acc_lora_models_manager,
-                        acc_textinv_manager,
-                        acc_sd_models_downloader,
-                        acc_gguf_models_downloader,
-                        biniou_login_user,
-                        biniou_login_pass,
-                        biniou_login_test,
-                    ]
-                )
-                btn_biniou_logout.click(
-                    fn=biniou_settings_logout,
-                    inputs=None,
-                    outputs=[
-                        acc_webui,
-                        acc_models_cleaner,
-                        acc_lora_models_manager,
-                        acc_textinv_manager,
-                        acc_sd_models_downloader,
-                        acc_gguf_models_downloader,
-                        biniou_login_user,
-                        biniou_login_pass,
-                    ]
-                )
-                btn_biniou_logout.click(fn=lambda: gr.Info(biniou_lang_tab_login_btn_logout_message))
-                biniou_login_test.change(fn=biniou_settings_login_test, inputs=biniou_login_test)
-                biniou_login_test.change(fn=biniou_settings_login_test_clean, outputs=biniou_login_test)
 
     tab_text_num = gr.Number(value=tab_text.id, precision=0, visible=False)
     tab_image_num = gr.Number(value=tab_image.id, precision=0, visible=False)
@@ -10966,8 +10876,6 @@ if __name__ == "__main__":
         favicon_path="./images/biniou_64.ico",
         ssl_keyfile="./ssl/key.pem" if not biniou_global_share else None,
         ssl_verify=False,
-        auth=biniou_auth_values if biniou_global_auth else None,
-        auth_message=biniou_global_auth_message if biniou_global_auth else None,
         share=biniou_global_share,
         inbrowser=biniou_global_inbrowser,
 #        inbrowser=True if len(sys.argv)>1 and sys.argv[1]=="--inbrowser" else biniou_global_inbrowser,

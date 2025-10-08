@@ -15,7 +15,7 @@ import gc
 from math import ceil
 import psutil
 import requests as rq
-from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
+from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
 from transformers import AutoFeatureExtractor
 import numpy as np
 from ressources.scheduler import *
